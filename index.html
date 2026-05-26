@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fióre - Boutique de Fleurs | Cửa hàng hoa tươi cao cấp & Sang trọng</title>
+    <meta name="description" content="Khám phá các thiết kế hoa tươi tinh tế và sang trọng tại Fiòre. Dịch vụ đặt hoa cao cấp, giao hoa nhanh chóng, thiết kế thiệp chúc mừng viết tay độc quyền và thanh toán an toàn tiện lợi.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- EmailJS SDK CDN -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="main-header" id="mainHeader">
+        <div class="header-container">
+            <a href="#" class="logo" id="logoLink">
+                <span class="logo-accent">F</span>ióre
+            </a>
+            
+            <nav class="nav-menu">
+                <a href="#home" class="nav-link active">Trang Chủ</a>
+                <a href="#catalog" class="nav-link">Cửa Hàng</a>
+                <a href="#about" class="nav-link">Về Chúng Tôi</a>
+                <a href="#contact" class="nav-link">Liên Hệ</a>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="cart-trigger-btn" id="cartTrigger" aria-label="Mở giỏ hàng">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <span class="cart-badge" id="cartBadgeCount">0</span>
+                </button>
+                <button class="mobile-menu-trigger" id="mobileMenuTrigger" aria-label="Mở menu điện thoại">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE MENU NAV -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay">
+        <div class="mobile-nav-panel">
+            <button class="close-mobile-nav" id="closeMobileNav">&times;</button>
+            <div class="mobile-logo">Fióre</div>
+            <nav class="mobile-nav-links">
+                <a href="#home" class="mobile-link">Trang Chủ</a>
+                <a href="#catalog" class="mobile-link">Cửa Hàng</a>
+                <a href="#about" class="mobile-link">Về Chúng Tôi</a>
+                <a href="#contact" class="mobile-link">Liên Hệ</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero-section" id="home">
+            <div class="hero-image-overlay" style="background-image: url('images/hero_bg.png');"></div>
+            <div class="hero-content-wrapper">
+                <div class="hero-text-card">
+                    <span class="hero-subtitle">ARTISANAL FLOWER BOUTIQUE</span>
+                    <h1 class="hero-title">Khơi nguồn cảm xúc<br>qua từng cánh hoa</h1>
+                    <p class="hero-description">Fiòre mang đến những tác phẩm hoa nghệ thuật được thiết kế tỉ mỉ, gửi gắm trọn vẹn thông điệp yêu thương và sang trọng đến người nhận.</p>
+                    <a href="#catalog" class="btn btn-primary btn-lg" id="exploreBtn">
+                        <span>Khám phá bộ sưu tập</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span>Cuộn để khám phá</span>
+                <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+            </div>
+        </section>
+
+        <!-- CATALOG SECTION -->
+        <section class="catalog-section" id="catalog">
+            <div class="section-container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">BỘ SƯU TẬP MỚI NHẤT</span>
+                    <h2 class="section-title">Những Tác Phẩm Nghệ Thuật Nổi Bật</h2>
+                    <div class="section-divider"></div>
+                </div>
+
+                <!-- CATEGORY FILTERS -->
+                <div class="category-filters-container">
+                    <div class="category-filters" id="categoryFilters">
+                        <button class="filter-btn active" data-category="all">Tất Cả</button>
+                        <button class="filter-btn" data-category="romance">Tình Yêu & Sự Lãng Mạn</button>
+                        <button class="filter-btn" data-category="birthday">Sinh Nhật & Chúc Mừng</button>
+                        <button class="filter-btn" data-category="grand">Khai Trương & Sự Kiện</button>
+                        <button class="filter-btn" data-category="sympathy">Chia Buồn & Trang Trọng</button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTS GRID -->
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be generated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- BRAND VALUE / FEATURES SECTION -->
+        <section class="brand-values">
+            <div class="section-container">
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3 class="value-title">Tuyển Chọn Khắt Khe</h3>
+                        <p class="value-desc">Từng đóa hoa được tuyển chọn từ các nông trại cao cấp chuẩn quốc tế tại Đà Lạt và Ecuador.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                        </div>
+                        <h3 class="value-title">Giao Hoa Nhanh Hỏa Tốc</h3>
+                        <p class="value-desc">Cam kết giao hàng trong 2 giờ kể từ khi hoàn tất đơn hàng. Bảo quản chuyên nghiệp bằng xe máy lạnh.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        </div>
+                        <h3 class="value-title">Thiệp Viết Tay Nghệ Thuật</h3>
+                        <p class="value-desc">Mỗi đơn hàng đi kèm thiệp chúc mừng viết tay nắn nót bởi các nghệ nhân chữ nghệ thuật (Calligraphy).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section class="about-section" id="about">
+            <div class="section-container">
+                <div class="about-grid">
+                    <div class="about-image-wrapper">
+                        <div class="about-img-card" style="background-image: url('images/hero_bg.png');"></div>
+                    </div>
+                    <div class="about-text-content">
+                        <span class="section-subtitle">CÂU CHUYỆN CỦA CHÚNG TÔI</span>
+                        <h2 class="about-title">Nghệ Thuật Kể Chuyện Bằng Hoa</h2>
+                        <p>Thành lập từ năm 2022, <strong>Fiòre</strong> khởi đầu với ước mơ nâng tầm nghệ thuật cắm hoa tại Việt Nam. Chúng tôi không chỉ bán hoa tươi; chúng tôi tạo ra những trải nghiệm xúc cảm khó quên.</p>
+                        <p>Dưới bàn tay điêu luyện của các Floral Designer hàng đầu, mỗi bó hoa tại Fiòre là một tác phẩm độc bản kết hợp hài hòa giữa màu sắc, hương thơm và tính nghệ thuật đương đại Pháp và Ý.</p>
+                        <div class="about-metrics">
+                            <div class="metric-item">
+                                <span class="metric-num">15,000+</span>
+                                <span class="metric-lbl">Đơn hàng hoàn tất</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-num">98%</span>
+                                <span class="metric-lbl">Khách hàng hài lòng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="main-footer" id="contact">
+        <div class="footer-top">
+            <div class="section-container footer-grid">
+                <div class="footer-brand-column">
+                    <a href="#" class="footer-logo">Fiòre</a>
+                    <p class="footer-bio">Thương hiệu hoa tươi nghệ thuật hàng đầu Việt Nam. Tinh tế trong từng cánh hoa, trọn vẹn trong từng cảm xúc.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                        <a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="#" aria-label="Pinterest"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22a9 9 0 0 1-5-8.29C3 8.35 7.93 3 12 3c5 0 9 4.14 9 9.25 0 5-3.32 8.75-7.5 8.75-2.22 0-3.5-1.79-3.5-1.79q-.5 1.76-1 3.5a13.31 13.31 0 0 1-1.5 2.29"></path></svg></a>
+                    </div>
+                </div>
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">Liên Kết Nhanh</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Trang Chủ</a></li>
+                        <li><a href="#catalog">Cửa Hàng</a></li>
+                        <li><a href="#about">Về Chúng Tôi</a></li>
+                        <li><a href="#contact">Liên Hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact-column">
+                    <h4 class="footer-heading">Địa Chỉ Cửa Hàng</h4>
+                    <p class="contact-info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>128 Pasteur, Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+                    </p>
+                    <p class="contact-info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <span>Hotline: 1900 6825</span>
+                    </p>
+                    <p class="contact-info-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>Email: contact@fiore.vn</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <p>&copy; 2026 Fiòre. Designed with Passion.</p>
+        </div>
+    </footer>
+
+    <!-- SLIDING CART SIDEBAR -->
+    <div class="cart-sidebar-overlay" id="cartSidebarOverlay">
+        <div class="cart-sidebar" id="cartSidebar">
+            <div class="cart-sidebar-header">
+                <h3>Giỏ Hàng Của Bạn (<span id="cartSidebarCount">0</span>)</h3>
+                <button class="close-cart-btn" id="closeCartBtn" aria-label="Đóng giỏ hàng">&times;</button>
+            </div>
+            
+            <div class="cart-shipping-notice" id="cartShippingNotice">
+                <span class="notice-text">Mua thêm <strong id="freeShippingRemain">300.000đ</strong> để được miễn phí vận chuyển hỏa tốc!</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="shippingProgressBar"></div>
+                </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div class="cart-items-container" id="cartItemsContainer">
+                <!-- Cart items dynamically rendered -->
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="cart-sidebar-footer" id="cartSidebarFooter">
+                <div class="cart-totals">
+                    <div class="totals-row">
+                        <span>Tạm tính</span>
+                        <span id="cartSubtotal">0đ</span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Vận chuyển</span>
+                        <span id="cartShippingFee">Miễn phí</span>
+                    </div>
+                    <div class="totals-row total-amount">
+                        <span>Tổng cộng</span>
+                        <span id="cartGrandTotal">0đ</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-block checkout-trigger-btn" id="checkoutTriggerBtn">
+                    <span>Tiến hành thanh toán</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div class="modal-overlay" id="productModalOverlay">
+        <div class="modal-card product-modal" id="productModal">
+            <button class="modal-close" id="closeProductModal">&times;</button>
+            <div class="product-modal-grid">
+                <div class="product-modal-image" id="modalProductImage"></div>
+                <div class="product-modal-details">
+                    <span class="modal-product-tag" id="modalProductTag">BESTSELLER</span>
+                    <h3 class="modal-product-title" id="modalProductTitle">Tên sản phẩm</h3>
+                    <p class="modal-product-price" id="modalProductPrice">650.000đ</p>
+                    
+                    <div class="modal-product-description" id="modalProductDescription">
+                        Mô tả chi tiết sản phẩm.
+                    </div>
+
+                    <!-- Options -->
+                    <div class="product-options">
+                        <div class="option-group">
+                            <label class="option-label">Chọn Kích Thước (Size):</label>
+                            <div class="size-selector-grid">
+                                <label class="size-option-card">
+                                    <input type="radio" name="flower-size" value="standard" checked>
+                                    <span class="size-card-content">
+                                        <span class="size-name">Standard</span>
+                                        <span class="size-desc">Bó hoa tiêu chuẩn gồm ~15-20 cành hoa chính kèm lá phụ trang trí.</span>
+                                        <span class="size-delta">+0đ</span>
+                                    </span>
+                                </label>
+                                <label class="size-option-card">
+                                    <input type="radio" name="flower-size" value="deluxe">
+                                    <span class="size-card-content">
+                                        <span class="size-name">Deluxe</span>
+                                        <span class="size-desc">Bó hoa lớn hơn ~25-30 cành hoa chính, sang trọng, đầy đặn.</span>
+                                        <span class="size-delta" id="sizeDeluxeDelta">+250.000đ</span>
+                                    </span>
+                                </label>
+                                <label class="size-option-card">
+                                    <input type="radio" name="flower-size" value="premium">
+                                    <span class="size-card-content">
+                                        <span class="size-name">Premium Signature</span>
+                                        <span class="size-desc">Đại tác phẩm cắm trong bình sứ hoặc gói cao cấp, cành hoa tuyển chọn xuất sắc.</span>
+                                        <span class="size-delta" id="sizePremiumDelta">+600.000đ</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <label for="modalCardMessage" class="option-label">Lời chúc trên thiệp (Viết tay Calligraphy miễn phí):</label>
+                            <textarea id="modalCardMessage" rows="3" placeholder="Nhập những lời chúc chân thành của bạn gửi tới người nhận..." maxlength="200"></textarea>
+                            <div class="char-counter">0 / 200 ký tự</div>
+                        </div>
+                    </div>
+
+                    <!-- Buy controls -->
+                    <div class="modal-actions-bar">
+                        <div class="qty-selector">
+                            <button class="qty-btn" id="modalQtyMinus">-</button>
+                            <input type="number" id="modalQtyInput" value="1" min="1" max="99" readonly>
+                            <button class="qty-btn" id="modalQtyPlus">+</button>
+                        </div>
+                        <button class="btn btn-primary btn-grow" id="modalAddToCartBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            <span>Thêm Vào Giỏ Hàng</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP-BY-STEP CHECKOUT MODAL -->
+    <div class="modal-overlay" id="checkoutModalOverlay">
+        <div class="modal-card checkout-modal" id="checkoutModal">
+            <!-- Modal Close -->
+            <button class="modal-close" id="closeCheckoutModal">&times;</button>
+            
+            <div class="checkout-layout">
+                <!-- Checkout Forms Area -->
+                <div class="checkout-main-content">
+                    <!-- Progress Bar Steps -->
+                    <div class="checkout-steps-indicator" id="checkoutStepsIndicator">
+                        <div class="step-indicator-item active" data-step="1">
+                            <span class="step-num">1</span>
+                            <span class="step-label">Vận Chuyển</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-indicator-item" data-step="2">
+                            <span class="step-num">2</span>
+                            <span class="step-label">Thanh Toán</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step-indicator-item" data-step="3">
+                            <span class="step-num">3</span>
+                            <span class="step-label">Hoàn Tất</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: SHIPPING DETAILS -->
+                    <div class="checkout-step-panel active" id="checkoutStep1">
+                        <h3 class="checkout-panel-title">Thông Tin Giao Hoa</h3>
+                        <form id="shippingForm" class="checkout-form">
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="senderName" class="form-label required">Tên Người Đặt</label>
+                                    <input type="text" id="senderName" class="form-control" required placeholder="Tên của bạn">
+                                </div>
+                                <div class="form-group">
+                                    <label for="senderPhone" class="form-label required">Số Điện Thoại Đặt</label>
+                                    <input type="tel" id="senderPhone" class="form-control" required placeholder="0901234567">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="senderEmail" class="form-label required">Email Của Bạn (Nhận Hóa Đơn & Xác Nhận)</label>
+                                <input type="email" id="senderEmail" class="form-control" required placeholder="email_cua_ban@gmail.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="recipientName" class="form-label required">Tên Người Nhận Hoa</label>
+                                <input type="text" id="recipientName" class="form-control" required placeholder="Tên người nhận hoa">
+                            </div>
+
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label for="recipientPhone" class="form-label required">Số Điện Thoại Nhận</label>
+                                    <input type="tel" id="recipientPhone" class="form-control" required placeholder="Số điện thoại người nhận">
+                                </div>
+                                <div class="form-group">
+                                    <label for="deliveryDate" class="form-label required">Ngày Giao Hàng</label>
+                                    <input type="date" id="deliveryDate" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="deliveryTimeSlot" class="form-label required">Khung Giờ Nhận</label>
+                                <select id="deliveryTimeSlot" class="form-control" required>
+                                    <option value="" disabled selected>Chọn khung giờ phù hợp</option>
+                                    <option value="08:00 - 10:00">Sáng sớm (08:00 - 10:00)</option>
+                                    <option value="10:00 - 12:00">Trưa (10:00 - 12:00)</option>
+                                    <option value="13:30 - 15:30">Chiều đầu (13:30 - 15:30)</option>
+                                    <option value="15:30 - 17:30">Chiều muộn (15:30 - 17:30)</option>
+                                    <option value="18:00 - 20:00">Tối lãng mạn (18:00 - 20:00)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="recipientAddress" class="form-label required">Địa Chỉ Giao Hoa</label>
+                                <input type="text" id="recipientAddress" class="form-control" required placeholder="Số nhà, tên đường, phường, quận...">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="checkoutCardMessage" class="form-label">Lời Chúc Đi Kèm (Nếu chưa nhập ở giỏ hàng)</label>
+                                <textarea id="checkoutCardMessage" class="form-control" rows="3" placeholder="Nhập những từ ngữ chân thành nhất của bạn..."></textarea>
+                            </div>
+
+                            <div class="checkout-actions">
+                                <span></span>
+                                <button type="submit" class="btn btn-primary" id="shippingFormSubmit">
+                                    <span>Bước tiếp theo: Thanh Toán</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- STEP 2: PAYMENT METHOD -->
+                    <div class="checkout-step-panel" id="checkoutStep2">
+                        <h3 class="checkout-panel-title">Chọn Phương Thức Thanh Toán</h3>
+                        
+                        <!-- Tabs -->
+                        <div class="payment-tabs">
+                            <button class="payment-tab-btn active" id="tabBtnCard" data-method="card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>Thẻ Tín Dụng (Visa/Master)</span>
+                            </button>
+                            <button class="payment-tab-btn" id="tabBtnQr" data-method="qr">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                <span>Chuyển Khoản QR Ngân Hàng</span>
+                            </button>
+                        </div>
+
+                        <!-- Panel: Credit Card -->
+                        <div class="payment-panel-content active" id="paymentPanelCard">
+                            <!-- GLASSMORPHIC INTERACTIVE CREDIT CARD PREVIEW -->
+                            <div class="interactive-card-wrapper">
+                                <div class="credit-card-preview" id="creditCardPreview">
+                                    <div class="card-face card-front">
+                                        <div class="card-chip"></div>
+                                        <div class="card-logo">VISA</div>
+                                        <div class="card-number-display" id="cardNumDisplay">•••• •••• •••• ••••</div>
+                                        <div class="card-lower">
+                                            <div class="card-holder-group">
+                                                <span class="card-label">CHỦ THẺ</span>
+                                                <div class="card-holder-display" id="cardHolderDisplay">NGUYEN VAN A</div>
+                                            </div>
+                                            <div class="card-expiry-group">
+                                                <span class="card-label">HẠN DÙNG</span>
+                                                <div class="card-expiry-display" id="cardExpiryDisplay">MM/YY</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <div class="card-magnetic-strip"></div>
+                                        <div class="card-signature-area">
+                                            <div class="card-cvv-display" id="cardCvvDisplay">•••</div>
+                                        </div>
+                                        <div class="card-back-text">Mã bảo mật CVV</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="creditCardForm" class="checkout-form">
+                                <div class="form-group">
+                                    <label for="cardNumber" class="form-label required">Số Thẻ Ngân Hàng</label>
+                                    <input type="text" id="cardNumber" class="form-control card-input" required placeholder="4111 2222 3333 4444" maxlength="19" autocomplete="cc-number">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardHolder" class="form-label required">Tên Trên Thẻ (Không dấu)</label>
+                                    <input type="text" id="cardHolder" class="form-control card-input" required placeholder="NGUYEN VAN A" style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-row-2">
+                                    <div class="form-group">
+                                        <label for="cardExpiry" class="form-label required">Ngày Hết Hạn (MM/YY)</label>
+                                        <input type="text" id="cardExpiry" class="form-control card-input" required placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cardCvv" class="form-label required">Mã Bảo Mật CVV</label>
+                                        <input type="password" id="cardCvv" class="form-control card-input" required placeholder="•••" maxlength="3" autocomplete="cc-csc">
+                                    </div>
+                                </div>
+                                
+                                <div class="checkout-actions">
+                                    <button type="button" class="btn btn-secondary back-to-step1-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                        <span>Quay lại</span>
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="cardPaymentSubmit">
+                                        <span>Thanh Toán Ngay</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Panel: Bank QR Code -->
+                        <div class="payment-panel-content" id="paymentPanelQr">
+                            <div class="qr-payment-wrapper">
+                                <div class="qr-container-box">
+                                    <div class="qr-code-frame">
+                                        <!-- Mock Dynamic VietQR layout with beautiful styling -->
+                                        <div class="vietqr-header">
+                                            <span class="bank-tag">VIETCOMBANK</span>
+                                            <span class="fast247-logo">VietQR 247</span>
+                                        </div>
+                                        <div class="qr-placeholder" id="qrPlaceholderImage">
+                                            <!-- SVG for nice procedural QR representation -->
+                                            <svg width="180" height="180" viewBox="0 0 29 29" fill="black" shape-rendering="crispEdges">
+                                                <!-- Top Left Finder Pattern -->
+                                                <rect x="0" y="0" width="7" height="7"/>
+                                                <rect x="1" y="1" width="5" height="5" fill="white"/>
+                                                <rect x="2" y="2" width="3" height="3"/>
+                                                <!-- Top Right Finder Pattern -->
+                                                <rect x="22" y="0" width="7" height="7"/>
+                                                <rect x="23" y="1" width="5" height="5" fill="white"/>
+                                                <rect x="24" y="2" width="3" height="3"/>
+                                                <!-- Bottom Left Finder Pattern -->
+                                                <rect x="0" y="22" width="7" height="7"/>
+                                                <rect x="1" y="23" width="5" height="5" fill="white"/>
+                                                <rect x="2" y="24" width="3" height="3"/>
+                                                <!-- Timing Patterns & Fake data pixels -->
+                                                <rect x="8" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="16" y="2" width="1" height="1"/><rect x="20" y="2" width="1" height="1"/>
+                                                <rect x="9" y="4" width="2" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="18" y="4" width="3" height="1"/>
+                                                <rect x="8" y="8" width="1" height="1"/><rect x="11" y="8" width="2" height="2"/><rect x="15" y="8" width="1" height="1"/><rect x="21" y="8" width="2" height="1"/>
+                                                <rect x="9" y="11" width="1" height="3"/><rect x="13" y="12" width="3" height="1"/><rect x="18" y="10" width="2" height="2"/>
+                                                <rect x="25" y="15" width="2" height="2"/><rect x="10" y="18" width="4" height="1"/><rect x="17" y="18" width="1" height="3"/>
+                                                <rect x="22" y="22" width="1" height="1"/><rect x="26" y="23" width="2" height="1"/><rect x="25" y="26" width="3" height="2"/>
+                                                <rect x="12" y="25" width="3" height="3"/><rect x="8" y="27" width="1" height="1"/><rect x="19" y="26" width="2" height="1"/>
+                                            </svg>
+                                            <div class="qr-center-icon">F</div>
+                                        </div>
+                                        <div class="vietqr-footer">
+                                            <span>Quét để thanh toán bằng ứng dụng ngân hàng</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="qr-payment-details">
+                                        <div class="qr-detail-item">
+                                            <span class="qr-lbl">Ngân hàng thụ hưởng:</span>
+                                            <strong class="qr-val">Vietcombank (VCB)</strong>
+                                        </div>
+                                        <div class="qr-detail-item">
+                                            <span class="qr-lbl">Chủ tài khoản:</span>
+                                            <strong class="qr-val">BOUTIQUE DE FLEURS FIORE</strong>
+                                        </div>
+                                        <div class="qr-detail-item">
+                                            <span class="qr-lbl">Số tài khoản:</span>
+                                            <strong class="qr-val copyable" id="qrAccountNumber">1038 9898 7777</strong>
+                                        </div>
+                                        <div class="qr-detail-item">
+                                            <span class="qr-lbl">Số tiền cần chuyển:</span>
+                                            <strong class="qr-val text-brand" id="qrPaymentAmount">0đ</strong>
+                                        </div>
+                                        <div class="qr-detail-item">
+                                            <span class="qr-lbl">Nội dung chuyển khoản:</span>
+                                            <strong class="qr-val text-brand copyable" id="qrTransferMessage">FIORE88273</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="qr-alert-box">
+                                    <div class="spinner-circle-small"></div>
+                                    <span>Hệ thống đang chờ bạn quét mã QR... Cửa sổ sẽ tự động chuyển sang trang thành công sau khi hệ thống nhận được tiền giao dịch.</span>
+                                </div>
+
+                                <div class="checkout-actions qr-actions">
+                                    <button type="button" class="btn btn-secondary back-to-step1-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                        <span>Quay lại</span>
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btnSimulateQrPay">
+                                        <span>Giả Lập Đã Chuyển Tiền (Test)</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: ORDER SUCCESS -->
+                    <div class="checkout-step-panel" id="checkoutStep3">
+                        <div class="order-success-wrapper">
+                            <div class="success-animation-box">
+                                <div class="success-checkmark">
+                                    <div class="check-icon">
+                                        <span class="icon-line line-tip"></span>
+                                        <span class="icon-line line-long"></span>
+                                        <div class="icon-circle"></div>
+                                        <div class="icon-fix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="success-heading">Đặt Hoa Thành Công!</h3>
+                            <p class="success-subheading">Cảm ơn bạn đã lựa chọn **Fiòre** làm cầu nối gửi gắm yêu thương!</p>
+
+                            <div class="success-order-card">
+                                <div class="success-card-header">
+                                    <span>MÃ ĐƠN HÀNG: <strong id="successOrderId" class="text-brand">FIORE-188273</strong></span>
+                                    <span class="badge badge-success">Đã Thanh Toán</span>
+                                </div>
+                                <div class="success-card-body">
+                                    <div class="info-row">
+                                        <span>Người đặt:</span>
+                                        <span id="successSender" class="bold-text">Nguyễn Văn A</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>Email nhận hóa đơn:</span>
+                                        <span id="successEmail" class="bold-text text-brand">example@gmail.com</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>Người nhận:</span>
+                                        <span id="successRecipient" class="bold-text">Lê Thị B</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>Thời gian nhận:</span>
+                                        <span id="successDeliveryTime" class="bold-text">27/05/2026 trong khung giờ 10:00 - 12:00</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>Tổng tiền:</span>
+                                        <span id="successTotalAmount" class="bold-text text-brand">0đ</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>Thiệp đi kèm:</span>
+                                        <span id="successCardMessage" class="italic-text">"Chúc mừng sinh nhật mẹ thân yêu!"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="email-sending-status" id="emailSendingStatus">
+                                <div class="spinner-circle-small" id="emailSpinner"></div>
+                                <span id="emailStatusText">Đang chuẩn bị gửi email hóa đơn...</span>
+                            </div>
+
+                            <div class="success-info-footer">
+                                <p>Một email xác nhận đơn hàng kèm hóa đơn chi tiết đã được gửi đến bạn. Nhân viên Florist của Fiòre sẽ liên hệ với bạn qua điện thoại trong vòng 10 phút để xác thực thông tin thiệp chúc mừng.</p>
+                                <button type="button" class="btn btn-primary" id="btnCloseSuccessAndReset">
+                                    <span>Tiếp Tục Mua Sắm</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkout Sidebar Summary -->
+                <div class="checkout-sidebar-summary" id="checkoutSummaryPanel">
+                    <h4 class="summary-title">Tóm Tắt Đơn Hàng</h4>
+                    <div class="summary-items-list" id="checkoutSummaryItems">
+                        <!-- Items rendered dynamically -->
+                    </div>
+                    
+                    <div class="summary-totals">
+                        <div class="summary-totals-row">
+                            <span>Tạm tính:</span>
+                            <span id="checkoutSummarySubtotal">0đ</span>
+                        </div>
+                        <div class="summary-totals-row">
+                            <span>Phí vận chuyển:</span>
+                            <span id="checkoutSummaryShipping">Miễn phí</span>
+                        </div>
+                        <div class="summary-totals-row final-grand-total">
+                            <span>Tổng cộng:</span>
+                            <span id="checkoutSummaryTotal">0đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

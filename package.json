@@ -1,0 +1,20 @@
+{
+  "name": "fiore-boutique",
+  "version": "1.0.0",
+  "description": "Fiòre - Boutique de Fleurs Premium Flower Shop website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "browser-sync start --server --files \"*.html, *.css, *.js, images/*\""
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.3"
+  },
+  "keywords": [
+    "flower",
+    "boutique",
+    "e-commerce",
+    "premium"
+  ],
+  "author": "Fiòre",
+  "license": "ISC"
+}
