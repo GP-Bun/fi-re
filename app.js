@@ -17,49 +17,8 @@ const EMAILJS_CONFIG = {
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. PRODUCT DATABASE ---
-    const PRODUCTS = [
-        {
-            id: 'bouquet_1',
-            title: 'Thơ Ngây Rose Bouquet',
-            category: 'romance',
-            categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
-            price: 750000,
-            image: 'images/bouquet_1.png',
-            tag: 'BESTSELLER',
-            description: 'Bó hoa "Thơ Ngây" được thiết kế ngọt ngào từ những đóa hồng nhập khẩu Ecuador cao cấp màu phấn hồng và trắng tinh khôi, kết hợp cành bạch đàn hương thơm dịu nhẹ. Đây là món quà hoàn hảo nhất gửi gắm trọn vẹn thông điệp lãng mạn dịu dàng cho người thương.'
-        },
-        {
-            id: 'bouquet_2',
-            title: 'Ánh Dương Tulip Bowl',
-            category: 'birthday',
-            categoryLabel: 'Sinh Nhật & Chúc Mừng',
-            price: 950000,
-            image: 'images/bouquet_2.png',
-            tag: 'NEW',
-            description: 'Tác phẩm hoa Tulip tươi nhập khẩu được sắp đặt tinh tế trong bình thủy tinh phong cách tối giản Bắc Âu. Những bông Tulip trắng đại diện cho sự chân thành, phối cùng Tulip vàng mang lại may mắn, thắp sáng mọi không gian sống.'
-        },
-        {
-            id: 'bouquet_3',
-            title: 'Dạ Khúc Hydrangea & Orchids',
-            category: 'grand',
-            categoryLabel: 'Khai Trương & Sự Kiện',
-            price: 1650000,
-            image: 'images/bouquet_3.png',
-            tag: 'LUXURY SIGNATURE',
-            description: 'Bình hoa nghệ thuật cẩm tú cầu đại đóa màu lam tím kiêu sa, điểm xuyết những nhánh lan hồ điệp trắng quý phái. Đặt trong bình sứ cao cấp, tác phẩm toát lên vẻ vương giả và thanh lịch khó tả, gửi gắm lời chúc thành công phát đạt.'
-        },
-        {
-            id: 'bouquet_4',
-            title: 'Nắng Sài Gòn Sunflower Wrap',
-            category: 'birthday',
-            categoryLabel: 'Tình Yêu & Chúc Mừng',
-            price: 580000,
-            image: 'images/bouquet_4.png',
-            tag: 'POPULAR',
-            description: 'Sự kết hợp hoàn hảo giữa những đóa hướng dương rực rỡ vàng óng cùng cúc Tana hoang dại ngọt ngào. Được bao bọc bởi lớp giấy kraft thô mộc và thắt nơ đay tinh tế, sản phẩm đem đến cảm giác ấm áp như tia nắng ban mai.'
-        }
-    ];
+    // --- 1. PRODUCT DATABASE (shared via products.js) ---
+    const PRODUCTS = window.FIORE_PRODUCTS || [];
 
     // --- 2. GLOBAL STATE ---
     let cart = JSON.parse(localStorage.getItem('fiore_cart')) || [];
@@ -178,57 +137,82 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutSummaryTotal = document.getElementById('checkoutSummaryTotal');
 
 
-    // --- 4. RENDER HOMEPAGE PRODUCTS ---
-    function renderProducts(filterCategory = 'all') {
-        productsGrid.innerHTML = '';
-        const filtered = filterCategory === 'all' 
-            ? PRODUCTS 
-            : PRODUCTS.filter(p => p.category === filterCategory);
+    function getTagClass(tag) {
+        const map = {
+            'NEW': 'tag-new',
+            'LUXURY': 'tag-luxury',
+            'POPULAR': 'tag-popular',
+            'BESTSELLER': 'tag-bestseller',
+            'SALE': 'tag-sale',
+            'SIGNATURE': 'tag-signature',
+            'LIMITED': 'tag-limited'
+        };
+        return map[tag] || '';
+    }
 
-        filtered.forEach((p, idx) => {
-            const card = document.createElement('article');
-            card.className = 'product-card';
-            card.style.animationDelay = `${idx * 0.1}s`;
-            card.id = `product-${p.id}`;
+    function buildProductCard(p, idx) {
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.style.animationDelay = `${idx * 0.08}s`;
+        card.id = `product-${p.id}`;
+        const tagExtra = getTagClass(p.tag);
 
-            card.innerHTML = `
-                <div class="product-image-area">
-                    <span class="product-tag">${p.tag}</span>
-                    <img class="product-image" src="${p.image}" alt="${p.title}" loading="lazy">
-                    <div class="product-hover-overlay">
-                        <button class="quick-view-btn" data-id="${p.id}">Xem Chi Tiết</button>
-                    </div>
+        card.innerHTML = `
+            <div class="product-image-area">
+                <span class="product-tag ${tagExtra}">${p.tag}</span>
+                <img class="product-image" src="${p.image}" alt="${p.title}" loading="lazy">
+                <div class="product-hover-overlay">
+                    <button class="quick-view-btn" data-id="${p.id}">Xem Chi Tiết</button>
                 </div>
-                <div class="product-info-area">
-                    <h3 class="product-title">${p.title}</h3>
-                    <span class="product-category">${p.categoryLabel}</span>
-                    <div class="product-card-footer">
-                        <span class="product-price">${formatCurrency(p.price)}</span>
-                        <button class="card-add-to-cart quick-add-btn" data-id="${p.id}" aria-label="Thêm vào giỏ hàng">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        </button>
-                    </div>
+            </div>
+            <div class="product-info-area">
+                <h3 class="product-title">${p.title}</h3>
+                <span class="product-category">${p.categoryLabel}</span>
+                <div class="product-card-footer">
+                    <span class="product-price">${formatCurrency(p.price)}</span>
+                    <button class="card-add-to-cart quick-add-btn" data-id="${p.id}" aria-label="Thêm vào giỏ hàng">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
                 </div>
-            `;
-            productsGrid.appendChild(card);
-        });
+            </div>
+        `;
+        return card;
+    }
 
-        // Add Quick View & Quick Add Listeners
-        document.querySelectorAll('.quick-view-btn').forEach(btn => {
+    function attachProductCardListeners(container) {
+        const root = container || document;
+        root.querySelectorAll('.quick-view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = e.target.getAttribute('data-id');
+                const id = e.currentTarget.getAttribute('data-id');
                 openProductModalFunc(id);
             });
         });
-
-        document.querySelectorAll('.quick-add-btn').forEach(btn => {
+        root.querySelectorAll('.quick-add-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const btnEl = e.currentTarget;
-                const id = btnEl.getAttribute('data-id');
-                quickAddToCart(id, btnEl);
+                quickAddToCart(btnEl.getAttribute('data-id'), btnEl);
             });
         });
+    }
+
+    function renderProductsToGrid(gridEl, productList) {
+        if (!gridEl) return;
+        gridEl.innerHTML = '';
+        productList.forEach((p, idx) => {
+            gridEl.appendChild(buildProductCard(p, idx));
+        });
+        attachProductCardListeners(gridEl);
+    }
+
+    // --- 4. RENDER HOMEPAGE PRODUCTS (featured only) ---
+    function renderProducts(filterCategory = 'all') {
+        if (!productsGrid) return;
+        let list = PRODUCTS.filter(p => p.featured);
+        if (filterCategory !== 'all') {
+            list = list.filter(p => p.category === filterCategory);
+        }
+        renderProductsToGrid(productsGrid, list);
     }
 
 
@@ -473,16 +457,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Filter Buttons logic
-    categoryFilters.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            categoryFilters.querySelector('.filter-btn.active').classList.remove('active');
-            e.target.classList.add('active');
-            
-            const cat = e.target.getAttribute('data-category');
-            renderProducts(cat);
+    // Filter Buttons logic (homepage)
+    if (categoryFilters) {
+        categoryFilters.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                categoryFilters.querySelector('.filter-btn.active').classList.remove('active');
+                e.target.classList.add('active');
+                renderProducts(e.target.getAttribute('data-category'));
+            });
         });
-    });
+    }
 
     // --- 8. PRODUCT DETAILED MODAL LOGIC ---
     function openProductModalFunc(productId) {
@@ -1029,7 +1013,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 14. INITIALIZE APP ---
-    renderProducts('all');
+    window.FioreApp = {
+        PRODUCTS,
+        formatCurrency,
+        renderProductsToGrid,
+        openProductModal: openProductModalFunc,
+        quickAddToCart,
+        getTagClass
+    };
+
+    if (productsGrid) {
+        renderProducts('all');
+    }
     updateCartUI();
 
 });

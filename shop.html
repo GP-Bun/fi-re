@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fióre - Boutique de Fleurs | Cửa hàng hoa tươi cao cấp & Sang trọng</title>
-    <meta name="description" content="Khám phá các thiết kế hoa tươi tinh tế và sang trọng tại Fióre. Dịch vụ đặt hoa cao cấp, giao hoa nhanh chóng, thiết kế thiệp chúc mừng viết tay độc quyền và thanh toán an toàn tiện lợi.">
+    <title>Cửa Hàng | Fióre - Boutique de Fleurs</title>
+    <meta name="description" content="Khám phá toàn bộ bộ sưu tập hoa tươi cao cấp tại Fióre. Hơn 20 thiết kế độc quyền — tình yêu, sinh nhật, khai trương, chia buồn. Lọc, tìm kiếm và đặt hàng online dễ dàng.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,7 @@
     
     <!-- CSS Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="shop.css">
 
     <!-- EmailJS SDK CDN -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -26,8 +27,8 @@
             </a>
             
             <nav class="nav-menu">
-                <a href="index.html#home" class="nav-link active">Trang Chủ</a>
-                <a href="shop.html" class="nav-link">Cửa Hàng</a>
+                <a href="index.html" class="nav-link">Trang Chủ</a>
+                <a href="shop.html" class="nav-link active">Cửa Hàng</a>
                 <a href="index.html#about" class="nav-link">Về Chúng Tôi</a>
                 <a href="index.html#contact" class="nav-link">Liên Hệ</a>
             </nav>
@@ -50,7 +51,7 @@
             <button class="close-mobile-nav" id="closeMobileNav">&times;</button>
             <div class="mobile-logo">Fióre</div>
             <nav class="mobile-nav-links">
-                <a href="index.html#home" class="mobile-link">Trang Chủ</a>
+                <a href="index.html" class="mobile-link">Trang Chủ</a>
                 <a href="shop.html" class="mobile-link">Cửa Hàng</a>
                 <a href="index.html#about" class="mobile-link">Về Chúng Tôi</a>
                 <a href="index.html#contact" class="mobile-link">Liên Hệ</a>
@@ -60,115 +61,91 @@
 
     <!-- MAIN CONTENT -->
     <main>
-        <!-- HERO SECTION -->
-        <section class="hero-section" id="home">
-            <div class="hero-image-overlay" style="background-image: url('images/hero_bg.png');"></div>
-            <div class="hero-content-wrapper">
-                <div class="hero-text-card">
-                    <span class="hero-subtitle">ARTISANAL FLOWER BOUTIQUE</span>
-                    <h1 class="hero-title">Khơi nguồn cảm xúc<br>qua từng cánh hoa</h1>
-                    <p class="hero-description">Fióre mang đến những tác phẩm hoa nghệ thuật được thiết kế tỉ mỉ, gửi gắm trọn vẹn thông điệp yêu thương và sang trọng đến người nhận.</p>
-                    <a href="shop.html" class="btn btn-primary btn-lg" id="exploreBtn">
-                        <span>Khám phá bộ sưu tập</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </a>
+        <!-- SHOP HERO -->
+        <section class="shop-hero">
+            <div class="shop-hero-content">
+                <div class="shop-hero-breadcrumb">
+                    <a href="index.html">Trang Chủ</a>
+                    <span>/</span>
+                    <span>Cửa Hàng</span>
                 </div>
-            </div>
-            <div class="scroll-indicator">
-                <span>Cuộn để khám phá</span>
-                <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+                <h1 class="shop-hero-title">Bộ Sưu Tập Hoa Tươi</h1>
+                <p class="shop-hero-subtitle">Hơn 20 thiết kế độc quyền — từ lãng mạn đến trang trọng</p>
             </div>
         </section>
 
-        <!-- CATALOG SECTION -->
-        <section class="catalog-section" id="catalog">
-            <div class="section-container">
-                <div class="section-header text-center">
-                    <span class="section-subtitle">BỘ SƯU TẬP MỚI NHẤT</span>
-                    <h2 class="section-title">Những Tác Phẩm Nghệ Thuật Nổi Bật</h2>
-                    <div class="section-divider"></div>
+        <!-- SHOP LAYOUT -->
+        <div class="shop-layout-wrapper">
+            <aside class="shop-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Tìm Kiếm</h3>
+                    <input type="search" id="shopSearchInput" class="shop-search-input" placeholder="Tên hoa, dịp lễ...">
                 </div>
 
-                <!-- CATEGORY FILTERS -->
-                <div class="category-filters-container">
-                    <div class="category-filters" id="categoryFilters">
-                        <button class="filter-btn active" data-category="all">Tất Cả</button>
-                        <button class="filter-btn" data-category="romance">Tình Yêu & Sự Lãng Mạn</button>
-                        <button class="filter-btn" data-category="birthday">Sinh Nhật & Chúc Mừng</button>
-                        <button class="filter-btn" data-category="grand">Khai Trương & Sự Kiện</button>
-                        <button class="filter-btn" data-category="sympathy">Chia Buồn & Trang Trọng</button>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Danh Mục</h3>
+                    <ul class="category-filter-list">
+                        <li class="category-filter-item">
+                            <label>
+                                <input type="checkbox" class="shop-cat-checkbox" value="romance" checked>
+                                Tình Yêu & Lãng Mạn
+                                <span class="category-count" data-cat-count="romance">0</span>
+                            </label>
+                        </li>
+                        <li class="category-filter-item">
+                            <label>
+                                <input type="checkbox" class="shop-cat-checkbox" value="birthday" checked>
+                                Sinh Nhật & Chúc Mừng
+                                <span class="category-count" data-cat-count="birthday">0</span>
+                            </label>
+                        </li>
+                        <li class="category-filter-item">
+                            <label>
+                                <input type="checkbox" class="shop-cat-checkbox" value="grand" checked>
+                                Khai Trương & Sự Kiện
+                                <span class="category-count" data-cat-count="grand">0</span>
+                            </label>
+                        </li>
+                        <li class="category-filter-item">
+                            <label>
+                                <input type="checkbox" class="shop-cat-checkbox" value="sympathy" checked>
+                                Chia Buồn & Trang Trọng
+                                <span class="category-count" data-cat-count="sympathy">0</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Khoảng Giá</h3>
+                    <div class="price-range-labels">
+                        <span>0đ</span>
+                        <span>Đến <strong id="shopPriceMaxLabel">3.000.000đ</strong></span>
                     </div>
+                    <input type="range" id="shopPriceSlider" class="price-slider" min="300000" max="3000000" step="50000" value="3000000">
                 </div>
 
-                <!-- PRODUCTS GRID -->
-                <div class="products-grid" id="productsGrid">
-                    <!-- Products will be generated by JavaScript -->
+                <button type="button" class="btn-clear-filters" id="shopClearFiltersBtn">Xóa Bộ Lọc</button>
+            </aside>
+
+            <div class="shop-main">
+                <div class="shop-toolbar">
+                    <p class="results-count" id="shopResultsCount">Hiển thị <strong>0</strong> sản phẩm</p>
+                    <select id="shopSortSelect" class="sort-select" aria-label="Sắp xếp sản phẩm">
+                        <option value="default">Mặc định</option>
+                        <option value="price-asc">Giá: Thấp → Cao</option>
+                        <option value="price-desc">Giá: Cao → Thấp</option>
+                        <option value="name">Tên A → Z</option>
+                    </select>
                 </div>
 
-                <div class="text-center" style="margin-top: 2.5rem;">
-                    <a href="shop.html" class="btn btn-secondary btn-lg">
-                        <span>Xem Tất Cả Sản Phẩm (20+)</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                    </a>
+                <div class="shop-products-grid" id="shopProductsGrid"></div>
+
+                <div class="load-more-wrapper">
+                    <button type="button" class="btn-load-more" id="shopLoadMoreBtn">Xem Thêm Sản Phẩm</button>
                 </div>
             </div>
-        </section>
-
-        <!-- BRAND VALUE / FEATURES SECTION -->
-        <section class="brand-values">
-            <div class="section-container">
-                <div class="values-grid">
-                    <div class="value-card">
-                        <div class="value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        </div>
-                        <h3 class="value-title">Tuyển Chọn Khắt Khe</h3>
-                        <p class="value-desc">Từng đóa hoa được tuyển chọn từ các nông trại cao cấp chuẩn quốc tế tại Đà Lạt và Ecuador.</p>
-                    </div>
-                    <div class="value-card">
-                        <div class="value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                        </div>
-                        <h3 class="value-title">Giao Hoa Nhanh Hỏa Tốc</h3>
-                        <p class="value-desc">Cam kết giao hàng trong 2 giờ kể từ khi hoàn tất đơn hàng. Bảo quản chuyên nghiệp bằng xe máy lạnh.</p>
-                    </div>
-                    <div class="value-card">
-                        <div class="value-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                        </div>
-                        <h3 class="value-title">Thiệp Viết Tay Nghệ Thuật</h3>
-                        <p class="value-desc">Mỗi đơn hàng đi kèm thiệp chúc mừng viết tay nắn nót bởi các nghệ nhân chữ nghệ thuật (Calligraphy).</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABOUT SECTION -->
-        <section class="about-section" id="about">
-            <div class="section-container">
-                <div class="about-grid">
-                    <div class="about-image-wrapper">
-                        <div class="about-img-card" style="background-image: url('images/hero_bg.png');"></div>
-                    </div>
-                    <div class="about-text-content">
-                        <span class="section-subtitle">CÂU CHUYỆN CỦA CHÚNG TÔI</span>
-                        <h2 class="about-title">Nghệ Thuật Kể Chuyện Bằng Hoa</h2>
-                        <p>Thành lập từ năm 2022, <strong>Fióre</strong> khởi đầu với ước mơ nâng tầm nghệ thuật cắm hoa tại Việt Nam. Chúng tôi không chỉ bán hoa tươi; chúng tôi tạo ra những trải nghiệm xúc cảm khó quên.</p>
-                        <p>Dưới bàn tay điêu luyện của các Floral Designer hàng đầu, mỗi bó hoa tại Fióre là một tác phẩm độc bản kết hợp hài hòa giữa màu sắc, hương thơm và tính nghệ thuật đương đại Pháp và Ý.</p>
-                        <div class="about-metrics">
-                            <div class="metric-item">
-                                <span class="metric-num">15,000+</span>
-                                <span class="metric-lbl">Đơn hàng hoàn tất</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-num">98%</span>
-                                <span class="metric-lbl">Khách hàng hài lòng</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
 
     <!-- FOOTER -->
@@ -176,12 +153,8 @@
         <div class="footer-top">
             <div class="section-container footer-grid">
                 <div class="footer-brand-column">
-                    <a href="#" class="footer-logo">Fióre</a>
-                    <p class="footer-bio">
-                        Flowers for every feeling.
-                        <br>
-                        Fióre tin rằng mỗi bó hoa đều là một câu chuyện — của yêu thương, biết ơn, hạnh phúc, hay những lời chưa kịp nói. Chúng tôi tạo nên những thiết kế tinh tế để bạn gửi gắm cảm xúc theo cách đẹp nhất.
-                    </p>
+                    <a href="index.html" class="footer-logo">Fióre</a>
+                    <p class="footer-bio">Thương hiệu hoa tươi nghệ thuật hàng đầu Việt Nam. Tinh tế trong từng cánh hoa, trọn vẹn trong từng cảm xúc.</p>
                     <div class="social-links">
                         <a href="https://www.facebook.com/profile.php?id=61590093366956" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
                         <a href="https://www.instagram.com/fiore_floral1/?hl=en" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
@@ -195,7 +168,7 @@
                 <div class="footer-links-column">
                     <h4 class="footer-heading">Liên Kết Nhanh</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html#home">Trang Chủ</a></li>
+                        <li><a href="index.html">Trang Chủ</a></li>
                         <li><a href="shop.html">Cửa Hàng</a></li>
                         <li><a href="index.html#about">Về Chúng Tôi</a></li>
                         <li><a href="index.html#contact">Liên Hệ</a></li>
@@ -205,15 +178,15 @@
                     <h4 class="footer-heading">Địa Chỉ Cửa Hàng</h4>
                     <p class="contact-info-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>34 Trần Thái Tông, Thuần Hóa,TP.Huế</span>
+                        <span>128 Pasteur, Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
                     </p>
                     <p class="contact-info-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span>Hotline: 0916044683</span>
+                        <span>Hotline: 1900 6825</span>
                     </p>
                     <p class="contact-info-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span>Email: thuyvanngo35@gmail.com</span>
+                        <span>Email: contact@fiore.vn</span>
                     </p>
                 </div>
             </div>
@@ -561,7 +534,7 @@
                                         </div>
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Chủ tài khoản:</span>
-                                            <strong class="qr-val">Fióre Shop</strong>
+                                            <strong class="qr-val">BOUTIQUE DE FLEURS FIORE</strong>
                                         </div>
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Số tài khoản:</span>
@@ -692,5 +665,6 @@
     <!-- JS Scripts -->
     <script src="products.js"></script>
     <script src="app.js"></script>
+    <script src="shop.js"></script>
 </body>
 </html>
