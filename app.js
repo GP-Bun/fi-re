@@ -27,6 +27,50 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedPaymentMethod = 'card'; // 'card' or 'qr'
     let qrSimulateInterval = null;
 
+    // --- 2a. ORDERS STORAGE (ADMIN) ---
+    const ORDERS_STORAGE_KEY = 'fiore_orders';
+    const SAVED_CARD_STORAGE_KEY = 'fiore_saved_card_number';
+
+    function readOrdersFromStorage() {
+        try {
+            const raw = localStorage.getItem(ORDERS_STORAGE_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function writeOrdersToStorage(orders) {
+        localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    function addOrderToStorage(order) {
+        const orders = readOrdersFromStorage();
+        orders.unshift(order); // newest first
+        writeOrdersToStorage(orders);
+    }
+
+    function getSavedCardDigits() {
+        try {
+            const raw = localStorage.getItem(SAVED_CARD_STORAGE_KEY) || '';
+            const digits = raw.replace(/\D/g, '');
+            return digits.length === 16 ? digits : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function setSavedCardDigits(digits16) {
+        const digits = (digits16 || '').replace(/\D/g, '').slice(0, 16);
+        if (digits.length !== 16) return;
+        localStorage.setItem(SAVED_CARD_STORAGE_KEY, digits);
+    }
+
+    function clearSavedCardDigits() {
+        localStorage.removeItem(SAVED_CARD_STORAGE_KEY);
+    }
+
     // --- 3. DOM ELEMENTS ---
     // Header & Navigation
     const mainHeader = document.getElementById('mainHeader');
@@ -631,12 +675,18 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutStep2.classList.remove('active');
         checkoutStep3.classList.remove('active');
 
-        // Reset Card Inputs
-        cardNumberInput.value = '';
+        // Reset Card Inputs (except saved card number)
+        if (getSavedCardDigits()) {
+            applySavedCardIfAny();
+        } else {
+            cardNumberInput.value = '';
+            cardNumberInput.readOnly = false;
+            delete cardNumberInput.dataset.locked;
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+        }
         cardHolderInput.value = '';
         cardExpiryInput.value = '';
         cardCvvInput.value = '';
-        cardNumDisplay.textContent = '•••• •••• •••• ••••';
         cardHolderDisplay.textContent = 'NGUYEN VAN A';
         cardExpiryDisplay.textContent = 'MM/YY';
         cardCvvDisplay.textContent = '•••';
@@ -768,12 +818,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 11. INTERACTIVE 3D CREDIT CARD EFFECT ---
 
+    function lockCardNumberIfComplete(inputEl) {
+        if (!inputEl || inputEl.dataset.locked === 'true') return;
+        const digits = (inputEl.value || '').replace(/\D/g, '');
+        if (digits.length >= 16) {
+            const clipped = digits.slice(0, 16);
+            const formatted = formatCardNumber(clipped);
+            inputEl.value = formatted;
+            inputEl.readOnly = true;
+            inputEl.dataset.locked = 'true';
+            inputEl.blur();
+            setSavedCardDigits(clipped);
+        }
+    }
+
     // Format & Sync card inputs to preview
     cardNumberInput.addEventListener('input', (e) => {
+        if (e.target.dataset.locked === 'true') return;
         const formatted = formatCardNumber(e.target.value);
         e.target.value = formatted;
         cardNumDisplay.textContent = formatted || '•••• •••• •••• ••••';
+        lockCardNumberIfComplete(e.target);
     });
+
+    cardNumberInput.addEventListener('focus', (e) => {
+        if (e.target.dataset.locked === 'true') {
+            e.target.blur();
+        }
+    });
+
+    function applySavedCardIfAny() {
+        const saved = getSavedCardDigits();
+        if (!saved) return;
+        const formatted = formatCardNumber(saved);
+        cardNumberInput.value = formatted;
+        cardNumDisplay.textContent = formatted;
+        cardNumberInput.readOnly = true;
+        cardNumberInput.dataset.locked = 'true';
+    }
+
+    const btnChangeCardNumber = document.getElementById('btnChangeCardNumber');
+    if (btnChangeCardNumber) {
+        btnChangeCardNumber.addEventListener('click', () => {
+            clearSavedCardDigits();
+            cardNumberInput.readOnly = false;
+            delete cardNumberInput.dataset.locked;
+            cardNumberInput.value = '';
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+            cardNumberInput.focus();
+        });
+    }
 
     cardHolderInput.addEventListener('input', (e) => {
         const formatted = e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
@@ -805,6 +899,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Card Form Checkout submission
     creditCardForm.addEventListener('submit', (e) => {
         e.preventDefault();
+
+        // Persist card number even if not auto-locked yet
+        const digits = (cardNumberInput.value || '').replace(/\D/g, '');
+        if (digits.length >= 16) {
+            setSavedCardDigits(digits.slice(0, 16));
+            applySavedCardIfAny();
+        }
         
         // Show payment spinner/loading screen for elegance
         const originalBtnText = document.getElementById('cardPaymentSubmit').innerHTML;
@@ -904,8 +1005,44 @@ document.addEventListener('DOMContentLoaded', () => {
         successTotalAmount.textContent  = orderTotal;
         successCardMessage.textContent  = `"${cardMsgVal}"`;
         
-        // Clear cart BEFORE sending email so email shows correct items
+        // Snapshot cart BEFORE clearing
         const cartSnapshot = [...cart];
+
+        // Persist order for admin page
+        addOrderToStorage({
+            id: orderId,
+            createdAt: new Date().toISOString(),
+            status: 'new', // new | processing | completed | cancelled
+            paymentMethod: selectedPaymentMethod,
+            sender: {
+                name: sender,
+                phone: senderPhone,
+                email: senderEmailVal
+            },
+            recipient: {
+                name: recipient,
+                phone: recipientPhone,
+                address
+            },
+            delivery: {
+                dateRaw: deliveryDateVal,
+                date: formattedDate,
+                timeSlot: deliveryTimeVal
+            },
+            cardMessage: cardMsgVal,
+            totalText: orderTotal,
+            items: cartSnapshot.map(item => ({
+                id: item.id,
+                title: item.title,
+                size: item.size,
+                singlePrice: item.singlePrice,
+                quantity: item.quantity,
+                image: item.image,
+                cardMessage: item.cardMessage || ''
+            }))
+        });
+
+        // Clear cart BEFORE sending email so email shows correct items
         cart = [];
         updateCartUI();
 
@@ -1005,6 +1142,18 @@ document.addEventListener('DOMContentLoaded', () => {
         shippingForm.reset();
         creditCardForm.reset();
         checkoutCardMessage.value = '';
+
+        // Unlock card number field for next order
+        if (getSavedCardDigits()) {
+            applySavedCardIfAny();
+        } else {
+            cardNumberInput.readOnly = false;
+            delete cardNumberInput.dataset.locked;
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+        }
+        cardHolderDisplay.textContent = 'NGUYEN VAN A';
+        cardExpiryDisplay.textContent = 'MM/YY';
+        cardCvvDisplay.textContent = '•••';
     }
 
     btnCloseSuccessAndReset.addEventListener('click', () => {
@@ -1025,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productsGrid) {
         renderProducts('all');
     }
+    applySavedCardIfAny();
     updateCartUI();
 
 });

@@ -4,7 +4,7 @@
 window.FIORE_PRODUCTS = [
     {
         id: 'bouquet_1',
-        title: 'Thơ Ngây Rose Bouquet',
+        title: 'Bó Hồng Thơ Ngây',
         category: 'romance',
         categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
         price: 750000,
@@ -15,7 +15,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_2',
-        title: 'Ánh Dương Tulip Bowl',
+        title: 'Bình Tulip Ánh Dương',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 950000,
@@ -26,7 +26,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_3',
-        title: 'Dạ Khúc Hydrangea & Orchids',
+        title: 'Dạ Khúc Cẩm Tú Cầu & Lan',
         category: 'grand',
         categoryLabel: 'Khai Trương & Sự Kiện',
         price: 1650000,
@@ -37,7 +37,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_4',
-        title: 'Nắng Sài Gòn Sunflower Wrap',
+        title: 'Bó Hướng Dương Nắng Sài Gòn',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 580000,
@@ -48,7 +48,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_5',
-        title: 'Velvet Red Romance',
+        title: 'Lãng Mạn Nhung Đỏ',
         category: 'romance',
         categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
         price: 890000,
@@ -58,7 +58,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_6',
-        title: 'Pastel Dream Peonies',
+        title: 'Giấc Mơ Pastel Hoa Mẫu Đơn',
         category: 'romance',
         categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
         price: 1250000,
@@ -68,7 +68,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_7',
-        title: 'Golden Jubilee Roses',
+        title: 'Hồng Vàng Khải Hoàn',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 720000,
@@ -78,7 +78,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_8',
-        title: 'Birthday Sparkle Mix',
+        title: 'Sắc Màu Rạng Rỡ Sinh Nhật',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 650000,
@@ -88,7 +88,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_9',
-        title: 'Prosperity Grand Opening',
+        title: 'Khai Trương Thịnh Vượng',
         category: 'grand',
         categoryLabel: 'Khai Trương & Sự Kiện',
         price: 2200000,
@@ -98,7 +98,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_10',
-        title: 'Executive Orchid Tower',
+        title: 'Chậu Lan Hồ Điệp Thượng Lưu',
         category: 'grand',
         categoryLabel: 'Khai Trương & Sự Kiện',
         price: 1850000,
@@ -108,7 +108,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_11',
-        title: 'Serenity White Lilies',
+        title: 'Bình Yên Lys Trắng',
         category: 'sympathy',
         categoryLabel: 'Chia Buồn & Trang Trọng',
         price: 980000,
@@ -118,7 +118,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_12',
-        title: 'Gentle Grace Wreath',
+        title: 'Vòng Hoa Ân Tình Trang Nhã',
         category: 'sympathy',
         categoryLabel: 'Chia Buồn & Trang Trọng',
         price: 1450000,
@@ -128,7 +128,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_13',
-        title: 'Lavender Mist Arrangement',
+        title: 'Sương Oải Hương Dịu Nhẹ',
         category: 'romance',
         categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
         price: 820000,
@@ -138,7 +138,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_14',
-        title: 'Citrus Garden Box',
+        title: 'Hộp Hoa Khu Vườn Cam Vàng',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 1100000,
@@ -148,7 +148,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_15',
-        title: 'Royal Phoenix Khai Trương',
+        title: 'Phượng Hoàng Hoàng Gia Khai Trương',
         category: 'grand',
         categoryLabel: 'Khai Trương & Sự Kiện',
         price: 2800000,
@@ -158,7 +158,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_16',
-        title: 'Eternal Peace Chrysanthemum',
+        title: 'Cúc An Yên Vĩnh Cửu',
         category: 'sympathy',
         categoryLabel: 'Chia Buồn & Trang Trọng',
         price: 750000,
@@ -168,7 +168,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_17',
-        title: 'Midnight Velvet Orchid',
+        title: 'Lan Nhung Đêm',
         category: 'romance',
         categoryLabel: 'Tình Yêu & Sự Lãng Mạn',
         price: 1380000,
@@ -178,7 +178,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_18',
-        title: 'Spring Meadow Hand-tied',
+        title: 'Bó Hoa Đồng Cỏ Mùa Xuân',
         category: 'birthday',
         categoryLabel: 'Sinh Nhật & Chúc Mừng',
         price: 490000,
@@ -188,7 +188,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_19',
-        title: 'Monochrome Elegance',
+        title: 'Thanh Lịch Đơn Sắc',
         category: 'sympathy',
         categoryLabel: 'Chia Buồn & Trang Trọng',
         price: 1150000,
@@ -198,7 +198,7 @@ window.FIORE_PRODUCTS = [
     },
     {
         id: 'bouquet_20',
-        title: 'Champagne Celebration Tower',
+        title: 'Tháp Hoa Champagne Chúc Mừng',
         category: 'grand',
         categoryLabel: 'Khai Trương & Sự Kiện',
         price: 1950000,

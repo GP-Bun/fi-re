@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Đơn Hàng | Fióre</title>
+    <meta name="description" content="Trang admin quản lý đơn hàng đã đặt của Fióre.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="main-header" id="mainHeader">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <span class="logo-accent">F</span>ióre
+            </a>
+
+            <nav class="nav-menu">
+                <a href="index.html#home" class="nav-link">Trang Chủ</a>
+                <a href="shop.html" class="nav-link">Cửa Hàng</a>
+                <a href="admin.html" class="nav-link active">Admin</a>
+            </nav>
+
+            <div class="header-actions">
+                <a class="btn btn-secondary" href="index.html" style="padding:10px 14px; border-radius: 999px; text-decoration:none;">
+                    Quay lại website
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-hero">
+            <div class="section-container">
+                <h1 class="admin-title">Quản Lý Đơn Hàng</h1>
+                <p class="admin-subtitle">Mỗi đơn sẽ tự lưu sau khi khách “Đặt hoa thành công”.</p>
+            </div>
+        </section>
+
+        <div class="admin-layout">
+            <div class="admin-toolbar">
+                <input id="adminSearch" class="admin-input" type="search" placeholder="Tìm theo mã đơn, tên, SĐT, email, địa chỉ, sản phẩm...">
+
+                <select id="adminStatus" class="admin-select" aria-label="Lọc trạng thái">
+                    <option value="all">Tất cả</option>
+                    <option value="new">Mới</option>
+                    <option value="processing">Đang xử lý</option>
+                    <option value="completed">Hoàn tất</option>
+                    <option value="cancelled">Đã hủy</option>
+                </select>
+
+                <select id="adminSort" class="admin-select" aria-label="Sắp xếp">
+                    <option value="newest">Mới nhất</option>
+                    <option value="oldest">Cũ nhất</option>
+                </select>
+
+                <div class="admin-actions">
+                    <button id="adminExportCsv" class="btn-admin primary" type="button">Export CSV</button>
+                    <button id="adminExportJson" class="btn-admin" type="button">Export JSON</button>
+                    <button id="adminSeed" class="btn-admin" type="button">Tạo demo</button>
+                    <button id="adminClearAll" class="btn-admin danger" type="button">Xóa tất cả</button>
+                </div>
+            </div>
+
+            <div class="admin-meta">
+                <div id="adminCount">0 đơn hàng</div>
+                <div style="font-size:12px;color:var(--color-text-secondary);">
+                    Gợi ý: bấm “Chuyển trạng thái” để chuyển vòng: Mới → Đang xử lý → Hoàn tất → Đã hủy
+                </div>
+            </div>
+
+            <div class="admin-table-wrap">
+                <div id="adminEmpty" class="admin-empty" style="display:none;">
+                    <h3>Chưa có đơn hàng nào</h3>
+                    <p>Hãy đặt thử 1 đơn từ trang web hoặc bấm “Tạo demo”.</p>
+                </div>
+
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách đặt</th>
+                            <th>Giao hàng</th>
+                            <th>Tổng</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- DETAILS MODAL -->
+    <div class="admin-modal-overlay" id="adminModalOverlay" aria-hidden="true">
+        <div class="admin-modal" role="dialog" aria-modal="true" aria-label="Chi tiết đơn hàng">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title" id="adminModalTitle">Chi tiết đơn</h3>
+                <button class="admin-modal-close" id="adminModalClose" type="button" aria-label="Đóng">&times;</button>
+            </div>
+            <div class="admin-modal-body" id="adminModalBody"></div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
+
