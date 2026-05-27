@@ -1294,6 +1294,103 @@ input, textarea, select {
     line-height: 1;
 }
 
+/* ==========================================================================
+   ADMIN LOGIN MODAL
+   ========================================================================== */
+#adminLoginOverlay .modal-card {
+    max-width: 520px;
+    width: 100%;
+}
+
+.admin-login-modal {
+    padding: 2rem 2rem 2.25rem;
+}
+
+.admin-login-header {
+    margin-bottom: 1.25rem;
+}
+
+.admin-login-title {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    color: var(--color-text-primary);
+    letter-spacing: -0.3px;
+}
+
+.admin-login-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.admin-login-form {
+    margin-top: 1rem;
+}
+
+.admin-login-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.admin-login-form .form-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.admin-login-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.admin-login-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    text-align: center;
+}
+
+.admin-login-error {
+    display: none;
+    margin-top: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid rgba(192, 57, 43, 0.25);
+    background: rgba(192, 57, 43, 0.08);
+    color: #c0392b;
+    font-weight: 650;
+    font-size: 0.9rem;
+}
+
+.admin-login-field {
+    position: relative;
+}
+
+.admin-login-field .form-control {
+    padding-right: 44px;
+}
+
+.admin-input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
+    color: var(--color-brand-green);
+    pointer-events: none;
+}
+
+@media (max-width: 520px) {
+    .admin-login-modal {
+        padding: 1.5rem 1.25rem 1.75rem;
+    }
+}
+
 /* 11. PRODUCT DETAIL MODAL */
 .product-modal-grid {
     display: grid;

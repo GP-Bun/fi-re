@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 2a. ORDERS STORAGE (ADMIN) ---
     const ORDERS_STORAGE_KEY = 'fiore_orders';
     const SAVED_CARD_STORAGE_KEY = 'fiore_saved_card_number';
+    const SAVED_CARD_HOLDER_KEY = 'fiore_saved_card_holder';
+    const SAVED_CARD_EXPIRY_KEY = 'fiore_saved_card_expiry';
+    const ADMIN_AUTH_SESSION_KEY = 'fiore_admin_authed';
+    const ADMIN_USERNAME = 'admin';
+    const ADMIN_PASSWORD = 'admin123';
 
     function readOrdersFromStorage() {
         try {
@@ -69,6 +74,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function clearSavedCardDigits() {
         localStorage.removeItem(SAVED_CARD_STORAGE_KEY);
+    }
+
+    function getSavedCardHolder() {
+        try {
+            return (localStorage.getItem(SAVED_CARD_HOLDER_KEY) || '').toString();
+        } catch {
+            return '';
+        }
+    }
+
+    function setSavedCardHolder(holder) {
+        const v = (holder || '').toString().trim();
+        if (!v) return;
+        localStorage.setItem(SAVED_CARD_HOLDER_KEY, v);
+    }
+
+    function clearSavedCardHolder() {
+        localStorage.removeItem(SAVED_CARD_HOLDER_KEY);
+    }
+
+    function getSavedCardExpiry() {
+        try {
+            const raw = (localStorage.getItem(SAVED_CARD_EXPIRY_KEY) || '').toString().trim();
+            return /^\d{2}\/\d{2}$/.test(raw) ? raw : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function setSavedCardExpiry(expiry) {
+        const v = (expiry || '').toString().trim();
+        if (!/^\d{2}\/\d{2}$/.test(v)) return;
+        localStorage.setItem(SAVED_CARD_EXPIRY_KEY, v);
+    }
+
+    function clearSavedCardExpiry() {
+        localStorage.removeItem(SAVED_CARD_EXPIRY_KEY);
     }
 
     // --- 3. DOM ELEMENTS ---
@@ -179,6 +221,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutSummarySubtotal = document.getElementById('checkoutSummarySubtotal');
     const checkoutSummaryShipping = document.getElementById('checkoutSummaryShipping');
     const checkoutSummaryTotal = document.getElementById('checkoutSummaryTotal');
+
+    // Admin Login Modal
+    const adminAccessBtn = document.getElementById('adminAccessBtn');
+    const adminLoginOverlay = document.getElementById('adminLoginOverlay');
+    const closeAdminLogin = document.getElementById('closeAdminLogin');
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminPassword = document.getElementById('adminPassword');
+    const adminLoginError = document.getElementById('adminLoginError');
 
 
     function getTagClass(tag) {
@@ -492,6 +543,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- 7a. ADMIN ACCESS FROM CART ---
+    function isAdminAuthed() {
+        try {
+            return sessionStorage.getItem(ADMIN_AUTH_SESSION_KEY) === 'true';
+        } catch {
+            return false;
+        }
+    }
+
+    function setAdminAuthed() {
+        sessionStorage.setItem(ADMIN_AUTH_SESSION_KEY, 'true');
+    }
+
+    function openAdminLogin() {
+        if (!adminLoginOverlay) return;
+        if (adminLoginError) {
+            adminLoginError.style.display = 'none';
+            adminLoginError.textContent = '';
+        }
+        if (adminUsername) adminUsername.value = '';
+        if (adminPassword) adminPassword.value = '';
+        adminLoginOverlay.classList.add('open');
+        setTimeout(() => adminUsername?.focus(), 0);
+    }
+
+    function closeAdminLoginModal() {
+        adminLoginOverlay?.classList.remove('open');
+    }
+
+    if (adminAccessBtn) {
+        adminAccessBtn.addEventListener('click', () => {
+            if (isAdminAuthed()) {
+                window.location.href = 'admin.html';
+                return;
+            }
+            openAdminLogin();
+        });
+    }
+
+    closeAdminLogin?.addEventListener('click', closeAdminLoginModal);
+    adminLoginOverlay?.addEventListener('click', (e) => {
+        if (e.target === adminLoginOverlay) closeAdminLoginModal();
+    });
+
+    adminLoginForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const u = (adminUsername?.value || '').trim();
+        const p = (adminPassword?.value || '').trim();
+
+        if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
+            setAdminAuthed();
+            closeAdminLoginModal();
+            window.location.href = 'admin.html';
+            return;
+        }
+
+        if (adminLoginError) {
+            adminLoginError.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
+            adminLoginError.style.display = 'block';
+        }
+    });
+
     // Sticky Header Scroll effect
     window.addEventListener('scroll', () => {
         if (window.scrollY > 40) {
@@ -675,20 +788,26 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutStep2.classList.remove('active');
         checkoutStep3.classList.remove('active');
 
-        // Reset Card Inputs (except saved card number)
-        if (getSavedCardDigits()) {
+        // Reset Card Inputs (keep saved number/name/expiry; CVV always required)
+        const hasSaved = !!getSavedCardDigits();
+        if (hasSaved) {
             applySavedCardIfAny();
         } else {
             cardNumberInput.value = '';
             cardNumberInput.readOnly = false;
             delete cardNumberInput.dataset.locked;
             cardNumDisplay.textContent = '•••• •••• •••• ••••';
+
+            cardHolderInput.value = '';
+            cardHolderInput.readOnly = false;
+            cardHolderDisplay.textContent = 'NGUYEN VAN A';
+
+            cardExpiryInput.value = '';
+            cardExpiryInput.readOnly = false;
+            cardExpiryDisplay.textContent = 'MM/YY';
         }
-        cardHolderInput.value = '';
-        cardExpiryInput.value = '';
+
         cardCvvInput.value = '';
-        cardHolderDisplay.textContent = 'NGUYEN VAN A';
-        cardExpiryDisplay.textContent = 'MM/YY';
         cardCvvDisplay.textContent = '•••';
         creditCardPreview.classList.remove('flipped');
         
@@ -855,27 +974,54 @@ document.addEventListener('DOMContentLoaded', () => {
         cardNumDisplay.textContent = formatted;
         cardNumberInput.readOnly = true;
         cardNumberInput.dataset.locked = 'true';
+
+        const holder = getSavedCardHolder();
+        if (holder) {
+            cardHolderInput.value = holder;
+            cardHolderDisplay.textContent = holder;
+            cardHolderInput.readOnly = true;
+        }
+
+        const expiry = getSavedCardExpiry();
+        if (expiry) {
+            cardExpiryInput.value = expiry;
+            cardExpiryDisplay.textContent = expiry;
+            cardExpiryInput.readOnly = true;
+        }
     }
 
     const btnChangeCardNumber = document.getElementById('btnChangeCardNumber');
     if (btnChangeCardNumber) {
         btnChangeCardNumber.addEventListener('click', () => {
             clearSavedCardDigits();
+            clearSavedCardHolder();
+            clearSavedCardExpiry();
             cardNumberInput.readOnly = false;
             delete cardNumberInput.dataset.locked;
             cardNumberInput.value = '';
             cardNumDisplay.textContent = '•••• •••• •••• ••••';
+
+            cardHolderInput.readOnly = false;
+            cardHolderInput.value = '';
+            cardHolderDisplay.textContent = 'NGUYEN VAN A';
+
+            cardExpiryInput.readOnly = false;
+            cardExpiryInput.value = '';
+            cardExpiryDisplay.textContent = 'MM/YY';
+
             cardNumberInput.focus();
         });
     }
 
     cardHolderInput.addEventListener('input', (e) => {
+        if (e.target.readOnly) return;
         const formatted = e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
         e.target.value = formatted;
         cardHolderDisplay.textContent = formatted || 'NGUYEN VAN A';
     });
 
     cardExpiryInput.addEventListener('input', (e) => {
+        if (e.target.readOnly) return;
         const formatted = formatCardExpiry(e.target.value);
         e.target.value = formatted;
         cardExpiryDisplay.textContent = formatted || 'MM/YY';
@@ -900,12 +1046,22 @@ document.addEventListener('DOMContentLoaded', () => {
     creditCardForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Persist card number even if not auto-locked yet
+        // Persist card number/holder/expiry (CVV must be re-entered each time)
         const digits = (cardNumberInput.value || '').replace(/\D/g, '');
         if (digits.length >= 16) {
             setSavedCardDigits(digits.slice(0, 16));
-            applySavedCardIfAny();
         }
+
+        const holder = (cardHolderInput.value || '').trim().toUpperCase();
+        if (holder) setSavedCardHolder(holder);
+
+        const expiry = (cardExpiryInput.value || '').trim();
+        if (/^\d{2}\/\d{2}$/.test(expiry)) setSavedCardExpiry(expiry);
+
+        // Apply saved values back + lock (CVV stays editable)
+        applySavedCardIfAny();
+        cardCvvInput.value = '';
+        cardCvvDisplay.textContent = '•••';
         
         // Show payment spinner/loading screen for elegance
         const originalBtnText = document.getElementById('cardPaymentSubmit').innerHTML;
@@ -1143,16 +1299,21 @@ document.addEventListener('DOMContentLoaded', () => {
         creditCardForm.reset();
         checkoutCardMessage.value = '';
 
-        // Unlock card number field for next order
+        // Restore saved card fields (CVV always required)
+        cardNumberInput.readOnly = false;
+        delete cardNumberInput.dataset.locked;
+        cardHolderInput.readOnly = false;
+        cardExpiryInput.readOnly = false;
+
         if (getSavedCardDigits()) {
             applySavedCardIfAny();
         } else {
-            cardNumberInput.readOnly = false;
-            delete cardNumberInput.dataset.locked;
             cardNumDisplay.textContent = '•••• •••• •••• ••••';
+            cardHolderDisplay.textContent = 'NGUYEN VAN A';
+            cardExpiryDisplay.textContent = 'MM/YY';
         }
-        cardHolderDisplay.textContent = 'NGUYEN VAN A';
-        cardExpiryDisplay.textContent = 'MM/YY';
+
+        cardCvvInput.value = '';
         cardCvvDisplay.textContent = '•••';
     }
 

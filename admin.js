@@ -6,6 +6,17 @@
 
 (() => {
     const STORAGE_KEY = 'fiore_orders';
+    const ADMIN_AUTH_SESSION_KEY = 'fiore_admin_authed';
+
+    try {
+        if (sessionStorage.getItem(ADMIN_AUTH_SESSION_KEY) !== 'true') {
+            window.location.href = 'index.html';
+            return;
+        }
+    } catch {
+        window.location.href = 'index.html';
+        return;
+    }
 
     const el = {
         search: document.getElementById('adminSearch'),
