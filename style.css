@@ -1391,6 +1391,159 @@ input, textarea, select {
     }
 }
 
+/* ==========================================================================
+   USER AUTH (Đăng nhập / Đăng ký)
+   ========================================================================== */
+.user-auth-wrap {
+    position: relative;
+}
+
+.user-auth-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-white);
+    color: var(--color-brand-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.user-auth-btn:hover {
+    background: var(--color-bg-secondary);
+    transform: translateY(-1px);
+}
+
+.user-auth-btn.is-logged-in {
+    border-color: var(--color-brand-green);
+    background: rgba(82, 121, 111, 0.12);
+    box-shadow: 0 0 0 3px rgba(82, 121, 111, 0.15);
+}
+
+.user-auth-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 220px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    padding: 12px;
+    display: none;
+    z-index: 1200;
+}
+
+.user-auth-dropdown.open {
+    display: block;
+}
+
+.user-greeting {
+    margin: 0 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 650;
+    color: var(--color-brand-green);
+}
+
+.user-menu-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.user-menu-btn:hover {
+    background: var(--color-bg-secondary);
+}
+
+.user-menu-btn.danger {
+    color: #c0392b;
+}
+
+#userAuthOverlay .modal-card {
+    max-width: 480px;
+    width: 100%;
+}
+
+.auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    padding: 6px;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+}
+
+.auth-tab-btn {
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 650;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.auth-tab-btn.active {
+    background: var(--color-white);
+    color: var(--color-brand-green);
+    box-shadow: 0 2px 8px rgba(45, 58, 46, 0.08);
+}
+
+.auth-panel {
+    display: none;
+}
+
+.auth-panel.active {
+    display: block;
+}
+
+.auth-msg-success {
+    border-color: rgba(45, 106, 79, 0.25) !important;
+    background: rgba(45, 106, 79, 0.08) !important;
+    color: #2d6a4f !important;
+}
+
+.mobile-user-account {
+    font-size: 0.95rem;
+    color: var(--color-brand-green);
+    font-weight: 650;
+    padding: 0.5rem 0;
+    display: none;
+}
+
+.card-binding-notice {
+    margin-top: 10px;
+    padding: 0.75rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid rgba(82, 121, 111, 0.25);
+    background: rgba(82, 121, 111, 0.08);
+    color: #2d6a4f;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+#cardPaymentError {
+    margin-top: 10px;
+}
+
 /* 11. PRODUCT DETAIL MODAL */
 .product-modal-grid {
     display: grid;

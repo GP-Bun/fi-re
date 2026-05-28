@@ -34,6 +34,17 @@
             </nav>
             
             <div class="header-actions">
+                <div class="user-auth-wrap">
+                    <button type="button" class="user-auth-btn" id="userAuthTrigger" aria-label="Đăng nhập / Đăng ký" aria-haspopup="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </button>
+                    <div class="user-auth-dropdown" id="userAuthDropdown">
+                        <p class="user-greeting" id="userGreeting"></p>
+                        <button type="button" class="user-menu-btn" id="userMenuLogin">Đăng nhập</button>
+                        <button type="button" class="user-menu-btn" id="userMenuRegister">Đăng ký</button>
+                        <button type="button" class="user-menu-btn danger" id="userMenuLogout">Đăng xuất</button>
+                    </div>
+                </div>
                 <button class="cart-trigger-btn" id="cartTrigger" aria-label="Mở giỏ hàng">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                     <span class="cart-badge" id="cartBadgeCount">0</span>
@@ -55,6 +66,10 @@
                 <a href="shop.html" class="mobile-link">Cửa Hàng</a>
                 <a href="index.html#about" class="mobile-link">Về Chúng Tôi</a>
                 <a href="index.html#contact" class="mobile-link">Liên Hệ</a>
+                <span class="mobile-user-account" id="mobileUserAccount"></span>
+                <a href="#" class="mobile-link" id="mobileUserLogin">Đăng nhập</a>
+                <a href="#" class="mobile-link" id="mobileUserRegister">Đăng ký</a>
+                <a href="#" class="mobile-link" id="mobileUserLogout">Đăng xuất</a>
             </nav>
         </div>
     </div>
@@ -241,6 +256,68 @@
                 <button class="btn btn-secondary btn-block" id="adminAccessBtn" type="button" style="margin-top: 10px;">
                     <span>Admin (Quản lý đơn hàng)</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER AUTH MODAL -->
+    <div class="modal-overlay" id="userAuthOverlay">
+        <div class="modal-card admin-login-modal">
+            <button class="modal-close" id="closeUserAuth" aria-label="Đóng">&times;</button>
+            <div class="admin-login-header">
+                <h3 class="admin-login-title">Tài khoản Fióre</h3>
+                <p class="admin-login-subtitle">Đăng nhập để đặt hoa nhanh hơn và theo dõi đơn hàng dễ dàng.</p>
+            </div>
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="authTabLogin">Đăng nhập</button>
+                <button type="button" class="auth-tab-btn" id="authTabRegister">Đăng ký</button>
+            </div>
+            <div class="auth-panel active" id="authPanelLogin">
+                <form id="userLoginForm" class="checkout-form admin-login-form">
+                    <div class="form-group">
+                        <label class="form-label required" for="loginEmail">Email</label>
+                        <div class="admin-login-field">
+                            <input id="loginEmail" class="form-control" type="email" autocomplete="email" required placeholder="email@example.com">
+                            <svg class="admin-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="loginPassword">Mật khẩu</label>
+                        <div class="admin-login-field">
+                            <input id="loginPassword" class="form-control" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu">
+                            <svg class="admin-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <div class="admin-login-error" id="userLoginError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                </form>
+            </div>
+            <div class="auth-panel" id="authPanelRegister">
+                <form id="userRegisterForm" class="checkout-form admin-login-form">
+                    <div class="form-group">
+                        <label class="form-label required" for="regFullName">Họ và tên</label>
+                        <input id="regFullName" class="form-control" type="text" autocomplete="name" required placeholder="Nguyễn Văn A">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="regEmail">Email</label>
+                        <input id="regEmail" class="form-control" type="email" autocomplete="email" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regPhone">Số điện thoại</label>
+                        <input id="regPhone" class="form-control" type="tel" autocomplete="tel" placeholder="0901234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="regPassword">Mật khẩu</label>
+                        <input id="regPassword" class="form-control" type="password" autocomplete="new-password" required placeholder="Tối thiểu 6 ký tự" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="regPasswordConfirm">Xác nhận mật khẩu</label>
+                        <input id="regPasswordConfirm" class="form-control" type="password" autocomplete="new-password" required placeholder="Nhập lại mật khẩu" minlength="6">
+                        <div class="admin-login-error" id="userRegisterError"></div>
+                        <div class="admin-login-error auth-msg-success" id="userRegisterSuccess"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Tạo tài khoản</button>
+                </form>
             </div>
         </div>
     </div>
@@ -495,6 +572,8 @@
                                 <div class="form-group">
                                     <label for="cardNumber" class="form-label required">Số Thẻ Ngân Hàng</label>
                                     <input type="text" id="cardNumber" class="form-control card-input" required placeholder="4111 2222 3333 4444" maxlength="19" autocomplete="cc-number">
+                                    <div class="card-binding-notice" id="cardBindingNotice" hidden></div>
+                                    <div class="admin-login-error" id="cardPaymentError"></div>
                                     <div style="margin-top:8px; display:flex; justify-content:flex-end;">
                                         <button type="button" id="btnChangeCardNumber" class="btn btn-secondary" style="padding:8px 12px; font-size:12px;">
                                             Đổi thẻ
@@ -707,6 +786,7 @@
 
     <!-- JS Scripts -->
     <script src="products.js"></script>
+    <script src="auth.js"></script>
     <script src="app.js"></script>
     <script src="shop.js"></script>
 </body>

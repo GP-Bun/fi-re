@@ -788,28 +788,13 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutStep2.classList.remove('active');
         checkoutStep3.classList.remove('active');
 
-        // Reset Card Inputs (keep saved number/name/expiry; CVV always required)
-        const hasSaved = !!getSavedCardDigits();
-        if (hasSaved) {
-            applySavedCardIfAny();
-        } else {
-            cardNumberInput.value = '';
-            cardNumberInput.readOnly = false;
-            delete cardNumberInput.dataset.locked;
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-
-            cardHolderInput.value = '';
-            cardHolderInput.readOnly = false;
-            cardHolderDisplay.textContent = 'NGUYEN VAN A';
-
-            cardExpiryInput.value = '';
-            cardExpiryInput.readOnly = false;
-            cardExpiryDisplay.textContent = 'MM/YY';
-        }
-
         cardCvvInput.value = '';
         cardCvvDisplay.textContent = '•••';
         creditCardPreview.classList.remove('flipped');
+
+        if (window.FioreAuth) {
+            window.FioreAuth.prefillCheckoutForm();
+        }
         
         checkoutModalOverlay.classList.add('open');
     }
@@ -897,6 +882,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const randId = Math.floor(100000 + Math.random() * 900000);
         qrTransferMessage.textContent = `FIORE${randId}`;
         
+        setupCardPaymentFields();
+
         // If QR is selected, begin checking fake interval (in 10 seconds auto checkout)
         if (selectedPaymentMethod === 'qr') {
             startQrSimulation();
@@ -923,6 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentPanelCard.classList.add('active');
         paymentPanelQr.classList.remove('active');
         clearInterval(qrSimulateInterval);
+        setupCardPaymentFields();
     });
 
     tabBtnQr.addEventListener('click', () => {
@@ -937,81 +925,156 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 11. INTERACTIVE 3D CREDIT CARD EFFECT ---
 
-    function lockCardNumberIfComplete(inputEl) {
-        if (!inputEl || inputEl.dataset.locked === 'true') return;
-        const digits = (inputEl.value || '').replace(/\D/g, '');
-        if (digits.length >= 16) {
-            const clipped = digits.slice(0, 16);
-            const formatted = formatCardNumber(clipped);
-            inputEl.value = formatted;
-            inputEl.readOnly = true;
-            inputEl.dataset.locked = 'true';
-            inputEl.blur();
-            setSavedCardDigits(clipped);
+    const cardBindingNotice = document.getElementById('cardBindingNotice');
+    const cardPaymentError = document.getElementById('cardPaymentError');
+    const btnChangeCardNumber = document.getElementById('btnChangeCardNumber');
+
+    function showCardPaymentError(msg) {
+        if (!cardPaymentError) return;
+        if (!msg) {
+            cardPaymentError.style.display = 'none';
+            cardPaymentError.textContent = '';
+            return;
+        }
+        cardPaymentError.textContent = msg;
+        cardPaymentError.style.display = 'block';
+    }
+
+    function showCardBindingNotice(msg) {
+        if (!cardBindingNotice) return;
+        if (!msg) {
+            cardBindingNotice.hidden = true;
+            cardBindingNotice.textContent = '';
+            return;
+        }
+        cardBindingNotice.textContent = msg;
+        cardBindingNotice.hidden = false;
+    }
+
+    function resetCardFieldsEditable() {
+        cardNumberInput.readOnly = false;
+        delete cardNumberInput.dataset.locked;
+        cardHolderInput.readOnly = false;
+        cardExpiryInput.readOnly = false;
+    }
+
+    function setupCardPaymentFields() {
+        showCardPaymentError('');
+        resetCardFieldsEditable();
+        cardCvvInput.value = '';
+        cardCvvDisplay.textContent = '•••';
+        creditCardPreview.classList.remove('flipped');
+
+        const auth = window.FioreAuth;
+        const user = auth?.getCurrentUser?.();
+
+        if (!user) {
+            showCardBindingNotice('Vui lòng đăng nhập để thanh toán bằng thẻ Visa.');
+            cardNumberInput.value = '';
+            cardNumberInput.placeholder = '4111 2222 3333 4444';
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+            cardHolderInput.value = '';
+            cardHolderDisplay.textContent = 'NGUYEN VAN A';
+            cardExpiryInput.value = '';
+            cardExpiryDisplay.textContent = 'MM/YY';
+            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
+            return;
+        }
+
+        const bound = auth.getBoundCard(user.id);
+
+        if (bound) {
+            cardNumberInput.value = '';
+            cardNumberInput.placeholder = `Nhập lại số thẻ kết thúc ${bound.digits.slice(-4)}`;
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+            showCardBindingNotice(
+                `Mỗi tài khoản chỉ dùng một thẻ (•••• ${bound.digits.slice(-4)}). ` +
+                `Bạn phải nhập lại đúng số thẻ đã đăng ký lần đầu. CVV nhập mới mỗi lần thanh toán.`
+            );
+            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
+
+            if (bound.holder) {
+                cardHolderInput.value = bound.holder;
+                cardHolderDisplay.textContent = bound.holder;
+                cardHolderInput.readOnly = true;
+            } else {
+                cardHolderInput.value = '';
+                cardHolderInput.readOnly = false;
+                cardHolderDisplay.textContent = 'NGUYEN VAN A';
+            }
+
+            if (bound.expiry) {
+                cardExpiryInput.value = bound.expiry;
+                cardExpiryDisplay.textContent = bound.expiry;
+                cardExpiryInput.readOnly = true;
+            } else {
+                cardExpiryInput.value = '';
+                cardExpiryInput.readOnly = false;
+                cardExpiryDisplay.textContent = 'MM/YY';
+            }
+        } else {
+            showCardBindingNotice(
+                'Lần thanh toán đầu tiên: số thẻ sẽ được gắn cố định với tài khoản. ' +
+                'Từ lần sau bạn phải nhập lại đúng số thẻ đó mới thanh toán được.'
+            );
+            cardNumberInput.value = '';
+            cardNumberInput.placeholder = '4111 2222 3333 4444';
+            cardNumDisplay.textContent = '•••• •••• •••• ••••';
+            cardHolderInput.value = '';
+            cardHolderInput.readOnly = false;
+            cardHolderDisplay.textContent = 'NGUYEN VAN A';
+            cardExpiryInput.value = '';
+            cardExpiryInput.readOnly = false;
+            cardExpiryDisplay.textContent = 'MM/YY';
+            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
         }
     }
 
-    // Format & Sync card inputs to preview
+    function validateCardPayment() {
+        const auth = window.FioreAuth;
+        const user = auth?.getCurrentUser?.();
+
+        if (!user) {
+            return { ok: false, message: 'Vui lòng đăng nhập để thanh toán bằng thẻ Visa.' };
+        }
+
+        const digits = (cardNumberInput.value || '').replace(/\D/g, '').slice(0, 16);
+        if (digits.length !== 16) {
+            return { ok: false, message: 'Vui lòng nhập đủ 16 số thẻ.' };
+        }
+
+        const cvv = (cardCvvInput.value || '').replace(/\D/g, '');
+        if (cvv.length < 3) {
+            return { ok: false, message: 'Vui lòng nhập mã CVV (3 số).' };
+        }
+
+        const holder = (cardHolderInput.value || '').trim().toUpperCase();
+        if (!holder) {
+            return { ok: false, message: 'Vui lòng nhập tên trên thẻ.' };
+        }
+
+        const expiry = (cardExpiryInput.value || '').trim();
+        if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+            return { ok: false, message: 'Ngày hết hạn không hợp lệ (MM/YY).' };
+        }
+
+        const bound = auth.getBoundCard(user.id);
+        if (bound && digits !== bound.digits) {
+            return {
+                ok: false,
+                message: `Số thẻ không đúng. Tài khoản chỉ chấp nhận thẻ kết thúc ${bound.digits.slice(-4)}.`
+            };
+        }
+
+        return { ok: true, digits, holder, expiry, user, isFirstBind: !bound };
+    }
+
     cardNumberInput.addEventListener('input', (e) => {
-        if (e.target.dataset.locked === 'true') return;
         const formatted = formatCardNumber(e.target.value);
         e.target.value = formatted;
         cardNumDisplay.textContent = formatted || '•••• •••• •••• ••••';
-        lockCardNumberIfComplete(e.target);
+        showCardPaymentError('');
     });
-
-    cardNumberInput.addEventListener('focus', (e) => {
-        if (e.target.dataset.locked === 'true') {
-            e.target.blur();
-        }
-    });
-
-    function applySavedCardIfAny() {
-        const saved = getSavedCardDigits();
-        if (!saved) return;
-        const formatted = formatCardNumber(saved);
-        cardNumberInput.value = formatted;
-        cardNumDisplay.textContent = formatted;
-        cardNumberInput.readOnly = true;
-        cardNumberInput.dataset.locked = 'true';
-
-        const holder = getSavedCardHolder();
-        if (holder) {
-            cardHolderInput.value = holder;
-            cardHolderDisplay.textContent = holder;
-            cardHolderInput.readOnly = true;
-        }
-
-        const expiry = getSavedCardExpiry();
-        if (expiry) {
-            cardExpiryInput.value = expiry;
-            cardExpiryDisplay.textContent = expiry;
-            cardExpiryInput.readOnly = true;
-        }
-    }
-
-    const btnChangeCardNumber = document.getElementById('btnChangeCardNumber');
-    if (btnChangeCardNumber) {
-        btnChangeCardNumber.addEventListener('click', () => {
-            clearSavedCardDigits();
-            clearSavedCardHolder();
-            clearSavedCardExpiry();
-            cardNumberInput.readOnly = false;
-            delete cardNumberInput.dataset.locked;
-            cardNumberInput.value = '';
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-
-            cardHolderInput.readOnly = false;
-            cardHolderInput.value = '';
-            cardHolderDisplay.textContent = 'NGUYEN VAN A';
-
-            cardExpiryInput.readOnly = false;
-            cardExpiryInput.value = '';
-            cardExpiryDisplay.textContent = 'MM/YY';
-
-            cardNumberInput.focus();
-        });
-    }
 
     cardHolderInput.addEventListener('input', (e) => {
         if (e.target.readOnly) return;
@@ -1045,23 +1108,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Card Form Checkout submission
     creditCardForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        showCardPaymentError('');
 
-        // Persist card number/holder/expiry (CVV must be re-entered each time)
-        const digits = (cardNumberInput.value || '').replace(/\D/g, '');
-        if (digits.length >= 16) {
-            setSavedCardDigits(digits.slice(0, 16));
+        const validation = validateCardPayment();
+        if (!validation.ok) {
+            showCardPaymentError(validation.message);
+            if (!window.FioreAuth?.getCurrentUser?.()) {
+                window.FioreAuth?.openAuthModal?.('login');
+            }
+            return;
         }
 
-        const holder = (cardHolderInput.value || '').trim().toUpperCase();
-        if (holder) setSavedCardHolder(holder);
-
-        const expiry = (cardExpiryInput.value || '').trim();
-        if (/^\d{2}\/\d{2}$/.test(expiry)) setSavedCardExpiry(expiry);
-
-        // Apply saved values back + lock (CVV stays editable)
-        applySavedCardIfAny();
-        cardCvvInput.value = '';
-        cardCvvDisplay.textContent = '•••';
+        if (validation.isFirstBind) {
+            const bindResult = window.FioreAuth.bindCardToUser(validation.user.id, {
+                digits: validation.digits,
+                holder: validation.holder,
+                expiry: validation.expiry
+            });
+            if (!bindResult.ok) {
+                showCardPaymentError(bindResult.message);
+                return;
+            }
+        }
         
         // Show payment spinner/loading screen for elegance
         const originalBtnText = document.getElementById('cardPaymentSubmit').innerHTML;
@@ -1299,22 +1367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         creditCardForm.reset();
         checkoutCardMessage.value = '';
 
-        // Restore saved card fields (CVV always required)
-        cardNumberInput.readOnly = false;
-        delete cardNumberInput.dataset.locked;
-        cardHolderInput.readOnly = false;
-        cardExpiryInput.readOnly = false;
-
-        if (getSavedCardDigits()) {
-            applySavedCardIfAny();
-        } else {
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-            cardHolderDisplay.textContent = 'NGUYEN VAN A';
-            cardExpiryDisplay.textContent = 'MM/YY';
-        }
-
-        cardCvvInput.value = '';
-        cardCvvDisplay.textContent = '•••';
+        setupCardPaymentFields();
     }
 
     btnCloseSuccessAndReset.addEventListener('click', () => {
@@ -1335,7 +1388,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productsGrid) {
         renderProducts('all');
     }
-    applySavedCardIfAny();
     updateCartUI();
 
 });
