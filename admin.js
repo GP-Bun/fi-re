@@ -15,8 +15,10 @@
         // Show login screen, hide main content
         const loginContent = document.getElementById('adminLoginContent');
         const mainContent = document.getElementById('adminMainContent');
-        if (loginContent) loginContent.style.display = 'flex';
-        if (mainContent) mainContent.style.display = 'none';
+        // Login screen is already visible by default (no admin-hidden class)
+        // Just ensure main content is hidden
+        if (mainContent) mainContent.classList.add('admin-hidden');
+        if (loginContent) loginContent.classList.remove('admin-hidden');
 
         // Bind login form
         const loginForm = document.getElementById('adminLoginForm');
@@ -51,8 +53,9 @@
     // If authenticated, show main content, hide login screen
     const loginContent = document.getElementById('adminLoginContent');
     const mainContent = document.getElementById('adminMainContent');
-    if (loginContent) loginContent.style.display = 'none';
-    if (mainContent) mainContent.style.display = 'block';
+    if (loginContent) loginContent.classList.add('admin-hidden');
+    if (mainContent) mainContent.classList.remove('admin-hidden');
+
 
     // Storage Keys
     const ORDERS_KEY = 'fiore_orders';

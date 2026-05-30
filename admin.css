@@ -2,6 +2,9 @@
    FIÓRE — ADMIN PAGE PREMIUM STYLES
    ========================================================================== */
 
+/* Utility: hidden by default (JS toggles) */
+.admin-hidden { display: none !important; }
+
 :root {
     --color-bg-primary: #FAF7F2;      /* elegant cream */
     --color-bg-secondary: #F3ECE1;    /* soft cream */
