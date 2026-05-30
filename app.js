@@ -18,7 +18,19 @@ const EMAILJS_CONFIG = {
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. PRODUCT DATABASE (shared via products.js) ---
-    const PRODUCTS = window.FIORE_PRODUCTS || [];
+    let localProducts = null;
+    try {
+        const raw = localStorage.getItem('fiore_products');
+        localProducts = raw ? JSON.parse(raw) : null;
+    } catch (e) {}
+    
+    if (!localProducts || !Array.isArray(localProducts) || localProducts.length === 0) {
+        localProducts = window.FIORE_PRODUCTS || [];
+        try {
+            localStorage.setItem('fiore_products', JSON.stringify(localProducts));
+        } catch (e) {}
+    }
+    const PRODUCTS = localProducts;
 
     // --- 2. GLOBAL STATE ---
     let cart = JSON.parse(localStorage.getItem('fiore_cart')) || [];
@@ -26,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let checkoutStep = 1;
     let selectedPaymentMethod = 'card'; // 'card' or 'qr'
     let qrSimulateInterval = null;
+    let appliedCoupon = null; // State of applied promo/discount code
 
     // --- 2a. ORDERS STORAGE (ADMIN) ---
     const ORDERS_STORAGE_KEY = 'fiore_orders';
@@ -199,7 +212,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrTransferMessage = document.getElementById('qrTransferMessage');
     const qrAccountNumber = document.getElementById('qrAccountNumber');
     const btnSimulateQrPay = document.getElementById('btnSimulateQrPay');
+    const vietqrImg = document.getElementById('vietqrImg');
     const backToStep1Btns = document.querySelectorAll('.back-to-step1-btn');
+
+    // VietQR Config
+    const VIETQR_BANK = 'MB';
+    const VIETQR_ACCOUNT = '091604468';
+    const VIETQR_NAME = 'NGO THUY VAN';
+
+    function updateVietQR(amount, transferMsg) {
+        if (!vietqrImg) return;
+        const encodedMsg = encodeURIComponent(transferMsg || 'FIORE');
+        const encodedName = encodeURIComponent(VIETQR_NAME);
+        const url = `https://img.vietqr.io/image/${VIETQR_BANK}-${VIETQR_ACCOUNT}-compact2.png?amount=${Math.round(amount)}&addInfo=${encodedMsg}&accountName=${encodedName}`;
+        vietqrImg.src = url;
+        vietqrImg.style.display = 'block';
+        const fallback = document.getElementById('qrFallback');
+        if (fallback) fallback.style.display = 'none';
+    }
     
     // Step 3 Order Success Details
     const successOrderId = document.getElementById('successOrderId');
@@ -857,7 +887,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const shippingLimit = 1000000;
         const shippingFee = subtotal >= shippingLimit ? 0 : 50000;
-        const total = subtotal + shippingFee;
+        
+        // Calculate Discount
+        let discount = 0;
+        const discountTotalRow = document.getElementById('discountTotalRow');
+        const appliedPromoLabel = document.getElementById('appliedPromoLabel');
+        const checkoutSummaryDiscount = document.getElementById('checkoutSummaryDiscount');
+        
+        if (appliedCoupon && subtotal >= (appliedCoupon.minOrder || 0)) {
+            if (appliedCoupon.type === 'percentage') {
+                discount = Math.round((subtotal * (appliedCoupon.value || 0)) / 100);
+            } else if (appliedCoupon.type === 'fixed') {
+                discount = appliedCoupon.value || 0;
+            }
+            // Cap discount at subtotal
+            discount = Math.min(discount, subtotal);
+        } else {
+            appliedCoupon = null; // Reset if conditions no longer met
+        }
+        
+        if (discount > 0 && appliedCoupon) {
+            if (discountTotalRow) discountTotalRow.style.display = 'flex';
+            if (appliedPromoLabel) appliedPromoLabel.textContent = appliedCoupon.code;
+            if (checkoutSummaryDiscount) checkoutSummaryDiscount.textContent = `-${formatCurrency(discount)}`;
+        } else {
+            if (discountTotalRow) discountTotalRow.style.display = 'none';
+        }
+        
+        const total = Math.max(0, subtotal + shippingFee - discount);
 
         checkoutSummarySubtotal.textContent = formatCurrency(subtotal);
         checkoutSummaryShipping.textContent = shippingFee === 0 ? 'Miễn phí' : formatCurrency(shippingFee);
@@ -865,6 +922,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Step 2 QR payments updates
         qrPaymentAmount.textContent = formatCurrency(total);
+        // Auto-refresh VietQR with new amount (transfer message set later when step 2 opens)
+        const currentMsg = qrTransferMessage ? qrTransferMessage.textContent : 'FIORE';
+        updateVietQR(total, currentMsg);
     }
 
     // Step 1: Submit Form to go to Step 2
@@ -880,7 +940,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set up unique payment transfer description for QR
         const randId = Math.floor(100000 + Math.random() * 900000);
-        qrTransferMessage.textContent = `FIORE${randId}`;
+        const transferMsg = `FIORE${randId}`;
+        qrTransferMessage.textContent = transferMsg;
+
+        // Update VietQR with real amount & transfer message
+        const currentTotal = parseFloat(
+            (checkoutSummaryTotal?.textContent || '0').replace(/[^\d]/g, '')
+        ) || 0;
+        updateVietQR(currentTotal, transferMsg);
         
         setupCardPaymentFields();
 
@@ -1149,14 +1216,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 12. BANK QR CODE COPY ACTIONS & SIMULATOR ---
     
     // Copy Action on Account number
-    qrAccountNumber.addEventListener('click', () => {
-        copyTextToClipboard(qrAccountNumber.textContent.replace(/\s/g, ''), qrAccountNumber);
-    });
+    if (qrAccountNumber) {
+        qrAccountNumber.addEventListener('click', () => {
+            copyTextToClipboard(qrAccountNumber.textContent.replace(/\s/g, ''), qrAccountNumber);
+        });
+    }
 
     // Copy Action on message description
-    qrTransferMessage.addEventListener('click', () => {
-        copyTextToClipboard(qrTransferMessage.textContent, qrTransferMessage);
-    });
+    if (qrTransferMessage) {
+        qrTransferMessage.addEventListener('click', () => {
+            copyTextToClipboard(qrTransferMessage.textContent, qrTransferMessage);
+        });
+    }
 
     function copyTextToClipboard(text, element) {
         navigator.clipboard.writeText(text).then(() => {
@@ -1177,10 +1248,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 12000);
     }
 
-    btnSimulateQrPay.addEventListener('click', () => {
-        clearInterval(qrSimulateInterval);
-        completeCheckout();
-    });
+    if (btnSimulateQrPay) {
+        btnSimulateQrPay.addEventListener('click', () => {
+            clearInterval(qrSimulateInterval);
+            completeCheckout();
+        });
+    }
 
 
     // --- 13. COMPLETE ORDER SUCCESS STAGE ---
@@ -1255,6 +1328,17 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             cardMessage: cardMsgVal,
             totalText: orderTotal,
+            discountCode: appliedCoupon ? appliedCoupon.code : null,
+            discountAmount: appliedCoupon ? (function() {
+                let subtotal = cartSnapshot.reduce((sum, item) => sum + item.singlePrice * item.quantity, 0);
+                let disc = 0;
+                if (appliedCoupon.type === 'percentage') {
+                    disc = Math.round((subtotal * appliedCoupon.value) / 100);
+                } else {
+                    disc = appliedCoupon.value;
+                }
+                return Math.min(disc, subtotal);
+            })() : 0,
             items: cartSnapshot.map(item => ({
                 id: item.id,
                 title: item.title,
@@ -1367,13 +1451,99 @@ document.addEventListener('DOMContentLoaded', () => {
         creditCardForm.reset();
         checkoutCardMessage.value = '';
 
+        // Reset promo codes
+        appliedCoupon = null;
+        const promoInput = document.getElementById('promoCodeInput');
+        if (promoInput) promoInput.value = '';
+        const promoFeedback = document.getElementById('promoFeedback');
+        if (promoFeedback) {
+            promoFeedback.style.display = 'none';
+            promoFeedback.textContent = '';
+        }
+        const discountTotalRow = document.getElementById('discountTotalRow');
+        if (discountTotalRow) discountTotalRow.style.display = 'none';
+
         setupCardPaymentFields();
+    }
+
+    // --- 13b. PROMO CODE APPLICATION ---
+    const btnApplyPromo = document.getElementById('btnApplyPromo');
+    const promoCodeInput = document.getElementById('promoCodeInput');
+    const promoFeedback = document.getElementById('promoFeedback');
+
+    if (btnApplyPromo) {
+        btnApplyPromo.addEventListener('click', () => {
+            if (!promoCodeInput || !promoFeedback) return;
+            const code = (promoCodeInput.value || '').trim().toUpperCase();
+            promoFeedback.style.display = 'block';
+            
+            if (!code) {
+                promoFeedback.textContent = 'Vui lòng nhập mã giảm giá.';
+                promoFeedback.style.color = 'var(--color-error)';
+                appliedCoupon = null;
+                updateCheckoutSummary();
+                return;
+            }
+
+            // Get coupons from localStorage
+            let coupons = [];
+            try {
+                const raw = localStorage.getItem('fiore_coupons');
+                coupons = raw ? JSON.parse(raw) : [];
+            } catch (e) {}
+
+            // Pre-seed some default coupons if empty
+            if (!coupons || coupons.length === 0) {
+                coupons = [
+                    { code: 'WELCOME10', type: 'percentage', value: 10, minOrder: 0, active: true },
+                    { code: 'FIOREGOLD', type: 'percentage', value: 15, minOrder: 1500000, active: true },
+                    { code: 'FREESHIP', type: 'fixed', value: 50000, minOrder: 0, active: true }
+                ];
+                try {
+                    localStorage.setItem('fiore_coupons', JSON.stringify(coupons));
+                } catch (e) {}
+            }
+
+            const coupon = coupons.find(c => c.code.toUpperCase() === code);
+            
+            if (!coupon) {
+                promoFeedback.textContent = 'Mã giảm giá không hợp lệ.';
+                promoFeedback.style.color = 'var(--color-error)';
+                appliedCoupon = null;
+                updateCheckoutSummary();
+                return;
+            }
+
+            if (!coupon.active) {
+                promoFeedback.textContent = 'Mã giảm giá này đã hết hiệu lực.';
+                promoFeedback.style.color = 'var(--color-error)';
+                appliedCoupon = null;
+                updateCheckoutSummary();
+                return;
+            }
+
+            // Calculate current subtotal
+            const subtotal = cart.reduce((sum, item) => sum + item.singlePrice * item.quantity, 0);
+            if (subtotal < (coupon.minOrder || 0)) {
+                promoFeedback.textContent = `Mã này chỉ áp dụng cho đơn hàng tối thiểu ${formatCurrency(coupon.minOrder)}.`;
+                promoFeedback.style.color = 'var(--color-error)';
+                appliedCoupon = null;
+                updateCheckoutSummary();
+                return;
+            }
+
+            // Apply successfully!
+            appliedCoupon = coupon;
+            promoFeedback.textContent = `Áp dụng mã ${coupon.code} thành công!`;
+            promoFeedback.style.color = 'var(--color-success)';
+            
+            updateCheckoutSummary();
+        });
     }
 
     btnCloseSuccessAndReset.addEventListener('click', () => {
         resetOrderComplete();
     });
-
 
     // --- 14. INITIALIZE APP ---
     window.FioreApp = {
@@ -1388,6 +1558,221 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productsGrid) {
         renderProducts('all');
     }
+    // --- 15. PREMIUM CHATBOT LOGIC ---
+    const chatbotFab = document.getElementById('chatbotFab');
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const chatbotCloseBtn = document.getElementById('chatbotCloseBtn');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSendBtn = document.getElementById('chatbotSendBtn');
+
+    if (chatbotFab && chatbotWindow && chatbotCloseBtn && chatbotMessages) {
+        // Toggle Chat Window
+        chatbotFab.addEventListener('click', () => {
+            chatbotWindow.classList.add('open');
+            chatbotFab.style.display = 'none'; // Ẩn FAB khi mở cửa sổ chat
+            
+            // Send welcome message if empty
+            if (chatbotMessages.children.length === 0) {
+                sendBotMessage("Xin chào! 🌸 Fióre Boutique de Fleurs rất vui được hỗ trợ bạn. Bạn cần tư vấn chọn hoa, giao hàng hay thông tin gì ạ?", [
+                    { text: "💐 Chọn hoa sinh nhật", keyword: "sinh nhật" },
+                    { text: "🚚 Thời gian & phí ship", keyword: "giao hàng" },
+                    { text: "💳 Cách thức thanh toán", keyword: "thanh toán" },
+                    { text: "🎁 Khuyến mãi hiện có", keyword: "khuyến mãi" }
+                ]);
+            }
+        });
+
+        chatbotCloseBtn.addEventListener('click', () => {
+            chatbotWindow.classList.remove('open');
+            chatbotFab.style.display = 'flex'; // Hiện lại FAB khi đóng cửa sổ chat
+        });
+
+        // Click outside to close chat
+        document.addEventListener('click', (e) => {
+            if (!chatbotWindow.contains(e.target) && !chatbotFab.contains(e.target) && chatbotWindow.classList.contains('open')) {
+                chatbotWindow.classList.remove('open');
+                chatbotFab.style.display = 'flex';
+            }
+        });
+
+        // Send Message on Enter
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserSendMessage();
+            }
+        });
+
+        if (chatbotSendBtn) {
+            chatbotSendBtn.addEventListener('click', () => {
+                handleUserSendMessage();
+            });
+        }
+
+        function handleUserSendMessage() {
+            if (!chatbotInput) return;
+            const query = chatbotInput.value.trim();
+            if (!query) return;
+
+            // Render User Message
+            renderMessage(query, 'user');
+            chatbotInput.value = '';
+
+            // Simulate typing and reply
+            setTimeout(() => {
+                const reply = getBotReply(query);
+                sendBotMessage(reply.text, reply.quickReplies);
+            }, 800);
+        }
+
+        function renderMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chatbot-msg ${sender}`;
+            msgDiv.textContent = text;
+            chatbotMessages.appendChild(msgDiv);
+            
+            // Auto scroll to bottom
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function sendBotMessage(text, quickReplies = []) {
+            renderMessage(text, 'bot');
+
+            // Render Quick Replies
+            if (quickReplies && quickReplies.length > 0) {
+                const qrDiv = document.createElement('div');
+                qrDiv.className = 'chatbot-quick-replies';
+                
+                quickReplies.forEach(qr => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'chatbot-quick-btn';
+                    btn.textContent = qr.text;
+                    btn.addEventListener('click', () => {
+                        renderMessage(qr.text, 'user');
+                        qrDiv.remove(); // Xóa quick replies sau khi click
+                        
+                        setTimeout(() => {
+                            const reply = getBotReply(qr.keyword);
+                            sendBotMessage(reply.text, reply.quickReplies);
+                        }, 800);
+                    });
+                    qrDiv.appendChild(btn);
+                });
+                
+                chatbotMessages.appendChild(qrDiv);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+        }
+
+        function getBotReply(query) {
+            const q = query.toLowerCase();
+            
+            // Keywords matching
+            if (q.includes('sinh nhật') || q.includes('chúc mừng') || q.includes('sinh nhat')) {
+                return {
+                    text: "🎁 Đối với dịp sinh nhật, Fióre khuyên bạn nên chọn: \n1. Bó Hướng Dương Nắng Sài Gòn (580k) rực rỡ tươi trẻ. \n2. Bình Tulip Ánh Dương (950k) thanh lịch. \n3. Sắc Màu Rạng Rỡ (650k) đa sắc sang trọng. \nBạn có muốn xem chi tiết mẫu nào không ạ?",
+                    quickReplies: [
+                        { text: "🌻 Xem Hướng Dương 580k", keyword: "hướng dương" },
+                        { text: "🌷 Xem Tulip 950k", keyword: "tulip" },
+                        { text: "🏡 Xem bản đồ & địa chỉ", keyword: "địa chỉ" }
+                    ]
+                };
+            }
+            
+            if (q.includes('lãng mạn') || q.includes('yêu') || q.includes('tình yêu') || q.includes('người yêu') || q.includes('vo') || q.includes('vợ') || q.includes('tỏ tình')) {
+                return {
+                    text: "💖 Dành tặng sự ngọt ngào lãng mạn, các Floral Designer của Fióre gợi ý: \n1. Bó Hồng Thơ Ngây (750k) - bán chạy nhất, mang tone hồng phấn đài các. \n2. Lãng Mạn Nhung Đỏ (890k) - 99 đóa hồng đỏ thắm kiêu sa. \n3. Giấc Mơ Pastel Mẫu Đơn (1250k) sang trọng kiêu kỳ.",
+                    quickReplies: [
+                        { text: "🌹 Xem Bó Hồng Thơ Ngây", keyword: "thơ ngây" },
+                        { text: "🚚 Tư vấn ship hỏa tốc", keyword: "giao hàng" }
+                    ]
+                };
+            }
+
+            if (q.includes('hướng dương')) {
+                return {
+                    text: "🌻 Bó Hướng Dương Nắng Sài Gòn (580.000đ) là sự kết hợp hoàn hảo giữa những đóa hướng dương rực rỡ và cúc Tana hoang dã. Bọc bằng giấy kraft mộc và thắt nơ đay tinh tế, rất được ưa chuộng cho dịp chúc mừng, sinh nhật hoặc tốt nghiệp!",
+                    quickReplies: [
+                        { text: "🛍️ Đặt hoa hướng dương", keyword: "hướng dương" },
+                        { text: "💳 Hướng dẫn thanh toán", keyword: "thanh toán" }
+                    ]
+                };
+            }
+
+            if (q.includes('tulip')) {
+                return {
+                    text: "🌷 Bình Tulip Ánh Dương (950.000đ) gồm những đóa Tulip tươi nhập khẩu màu trắng và vàng, cắm nghệ thuật trong bình thủy tinh phong cách tối giản Bắc Âu. Rất hợp trang trí nhà cửa hoặc làm quà tặng tinh tế!",
+                    quickReplies: [
+                        { text: "💳 Xem số tài khoản thanh toán", keyword: "thanh toán" },
+                        { text: "🎁 Xem ưu đãi khác", keyword: "khuyến mãi" }
+                    ]
+                };
+            }
+
+            if (q.includes('giao hàng') || q.includes('ship') || q.includes('phí ship') || q.includes('giao hoa')) {
+                return {
+                    text: "🚚 Chính sách giao hoa cực nhanh của Fióre: \n- Cam kết giao hoa hỏa tốc trong 2 giờ. \n- Miễn phí vận chuyển cho đơn hàng từ 1.000.000đ trở lên. \n- Với đơn hàng dưới 1.000.000đ, phí ship đồng giá hỏa tốc nội thành là 50.000đ.",
+                    quickReplies: [
+                        { text: "💳 Cách thanh toán đơn", keyword: "thanh toán" },
+                        { text: "📞 Số điện thoại Hotline", keyword: "hotline" }
+                    ]
+                };
+            }
+
+            if (q.includes('thanh toán') || q.includes('chuyển khoản') || q.includes('ngân hàng') || q.includes('ck') || q.includes('tai khoan') || q.includes('tài khoản')) {
+                return {
+                    text: "💳 Fióre hỗ trợ 2 phương thức thanh toán an toàn: \n1. Quét mã QR Dynamic qua VietQR Ngân hàng MBBank: \n- Số tài khoản: 091604468 \n- Chủ tài khoản: Ngô Thủy Vân \n- Ngân hàng: MBBank (MB) \n2. Thẻ tín dụng quốc tế Visa/MasterCard bảo mật cao.",
+                    quickReplies: [
+                        { text: "🎁 Khuyến mãi giảm giá", keyword: "khuyến mãi" },
+                        { text: "📞 Liên hệ trực tiếp", keyword: "hotline" }
+                    ]
+                };
+            }
+
+            if (q.includes('khuyến mãi') || q.includes('giảm giá') || q.includes('mã giảm') || q.includes('coupon') || q.includes('voucher') || q.includes('code')) {
+                return {
+                    text: "🎁 Các chương trình ưu đãi hiện tại của Fióre: \n- Mã WELCOME10: Giảm ngay 10% cho đơn hàng đầu tiên. \n- Mã FIOREGOLD: Giảm 15% cho các đơn hàng cao cấp trên 1.500.000đ. \n- Mã FREESHIP: Miễn phí vận chuyển (50k) cho mọi đơn hàng.",
+                    quickReplies: [
+                        { text: "💳 Hướng dẫn thanh toán", keyword: "thanh toán" },
+                        { text: "🚚 Phí ship hỏa tốc", keyword: "giao hàng" }
+                    ]
+                };
+            }
+
+            if (q.includes('địa chỉ') || q.includes('cửa hàng') || q.includes('dia chi') || q.includes('huế') || q.includes('ở đâu')) {
+                return {
+                    text: "🏡 Showroom nghệ thuật hoa tươi Fióre: \n- Địa chỉ: 34 Trần Thái Tông, Thuần Hóa, TP. Huế. \n- Giờ mở cửa: 07:30 - 21:30 hàng ngày (kể cả ngày lễ). \nBạn có thể ghé trực tiếp showroom để ngắm hoa và thưởng trà nhé!",
+                    quickReplies: [
+                        { text: "📞 Gọi điện Hotline", keyword: "hotline" },
+                        { text: "💐 Tư vấn chọn mẫu hoa", keyword: "sinh nhật" }
+                    ]
+                };
+            }
+
+            if (q.includes('hotline') || q.includes('số điện thoại') || q.includes('sđt') || q.includes('liên hệ') || q.includes('dien thoai')) {
+                return {
+                    text: "📞 Bạn cần liên hệ gấp? \n- Hotline trực 24/7: 0916044683 \n- Email hỗ trợ: thuyvanngo35@gmail.com \nNhân viên chăm sóc khách hàng của Fióre sẽ hỗ trợ giải đáp mọi thắc mắc ngay lập tức ạ!",
+                    quickReplies: [
+                        { text: "🏡 Xem địa chỉ cửa hàng", keyword: "địa chỉ" },
+                        { text: "🎁 Xem các mã giảm giá", keyword: "khuyến mãi" }
+                    ]
+                };
+            }
+
+            // Default fallback
+            return {
+                text: "🌸 Fióre rất tiếc chưa hiểu rõ câu hỏi này. Bạn có thể nhấn chọn một trong các chủ đề gợi ý nhanh bên dưới, hoặc gọi trực tiếp Hotline 0916044683 để nhân viên Florist hỗ trợ bạn ngay tức khắc nhé!",
+                quickReplies: [
+                    { text: "💐 Tư vấn chọn hoa tươi", keyword: "sinh nhật" },
+                    { text: "🚚 Thời gian giao hàng", keyword: "giao hàng" },
+                    { text: "💳 Tài khoản ngân hàng", keyword: "thanh toán" },
+                    { text: "📞 Gọi Hotline 0916044683", keyword: "hotline" }
+                ]
+            };
+        }
+    }
+
     updateCartUI();
 
 });

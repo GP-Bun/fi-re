@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Đơn Hàng | Fióre</title>
-    <meta name="description" content="Trang admin quản lý đơn hàng đã đặt của Fióre.">
+    <title>Hệ thống Quản trị | Fióre</title>
+    <meta name="description" content="Hệ thống quản trị và kiểm soát cửa hàng hoa tươi Fióre.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,90 +16,415 @@
 </head>
 <body>
     <!-- HEADER -->
-    <header class="main-header" id="mainHeader">
+    <header class="main-header scrolled" id="mainHeader">
         <div class="header-container">
             <a href="index.html" class="logo">
-                <span class="logo-accent">F</span>ióre
+                <span class="logo-accent">F</span>ióre <span class="admin-badge">Admin</span>
             </a>
 
             <nav class="nav-menu">
-                <a href="index.html#home" class="nav-link">Trang Chủ</a>
+                <a href="index.html" class="nav-link">Trang Chủ</a>
                 <a href="shop.html" class="nav-link">Cửa Hàng</a>
                 <a href="admin.html" class="nav-link active">Admin</a>
             </nav>
 
             <div class="header-actions">
-                <a class="btn btn-secondary" href="index.html" style="padding:10px 14px; border-radius: 999px; text-decoration:none;">
+                <a class="btn btn-secondary" href="index.html" style="padding:10px 18px; border-radius: 999px; text-decoration:none; font-size: 13px;">
                     Quay lại website
                 </a>
             </div>
         </div>
     </header>
 
-    <main>
-        <section class="admin-hero">
-            <div class="section-container">
-                <h1 class="admin-title">Quản Lý Đơn Hàng</h1>
-                <p class="admin-subtitle">Mỗi đơn sẽ tự lưu sau khi khách “Đặt hoa thành công”.</p>
-            </div>
-        </section>
-
-        <div class="admin-layout">
-            <div class="admin-toolbar">
-                <input id="adminSearch" class="admin-input" type="search" placeholder="Tìm theo mã đơn, tên, SĐT, email, địa chỉ, sản phẩm...">
-
-                <select id="adminStatus" class="admin-select" aria-label="Lọc trạng thái">
-                    <option value="all">Tất cả</option>
-                    <option value="new">Mới</option>
-                    <option value="processing">Đang xử lý</option>
-                    <option value="completed">Hoàn tất</option>
-                    <option value="cancelled">Đã hủy</option>
-                </select>
-
-                <select id="adminSort" class="admin-select" aria-label="Sắp xếp">
-                    <option value="newest">Mới nhất</option>
-                    <option value="oldest">Cũ nhất</option>
-                </select>
-
-                <div class="admin-actions">
-                    <button id="adminExportCsv" class="btn-admin primary" type="button">Export CSV</button>
-                    <button id="adminExportJson" class="btn-admin" type="button">Export JSON</button>
-                    <button id="adminSeed" class="btn-admin" type="button">Tạo demo</button>
-                    <button id="adminClearAll" class="btn-admin danger" type="button">Xóa tất cả</button>
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="admin-user-avatar">AD</div>
+                <div class="admin-user-info">
+                    <h4>Quản trị viên</h4>
+                    <span>admin@fiore.vn</span>
                 </div>
             </div>
-
-            <div class="admin-meta">
-                <div id="adminCount">0 đơn hàng</div>
-                <div style="font-size:12px;color:var(--color-text-secondary);">
-                    Gợi ý: bấm “Chuyển trạng thái” để chuyển vòng: Mới → Đang xử lý → Hoàn tất → Đã hủy
-                </div>
+            
+            <nav class="sidebar-menu">
+                <button type="button" class="sidebar-menu-item active" data-tab="dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                    <span>Tổng quan (Dashboard)</span>
+                </button>
+                <button type="button" class="sidebar-menu-item" data-tab="products">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <span>Quản lý Sản phẩm</span>
+                </button>
+                <button type="button" class="sidebar-menu-item" data-tab="orders">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Quản lý Đơn hàng</span>
+                </button>
+                <button type="button" class="sidebar-menu-item" data-tab="customers">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span>Quản lý Khách hàng</span>
+                </button>
+                <button type="button" class="sidebar-menu-item" data-tab="discounts">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    <span>Khuyến mãi & Mã giảm giá</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <span>Fióre Premium Boutique</span>
+                <p>v2.1.0 © 2026</p>
             </div>
+        </aside>
 
-            <div class="admin-table-wrap">
-                <div id="adminEmpty" class="admin-empty" style="display:none;">
-                    <h3>Chưa có đơn hàng nào</h3>
-                    <p>Hãy đặt thử 1 đơn từ trang web hoặc bấm “Tạo demo”.</p>
+        <!-- MAIN CONTENT AREA -->
+        <main class="admin-content">
+            
+            <!-- SECTION 1: DASHBOARD -->
+            <section class="admin-section active" id="section-dashboard">
+                <div class="section-header-wrap">
+                    <div>
+                        <h1 class="page-title">Bảng Điều Khiển Tổng Quan</h1>
+                        <p class="page-subtitle">Thống kê hoạt động kinh doanh và hiệu năng của cửa hàng.</p>
+                    </div>
                 </div>
 
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Mã đơn</th>
-                            <th>Khách đặt</th>
-                            <th>Giao hàng</th>
-                            <th>Tổng</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTbody"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-lbl">Tổng doanh thu</span>
+                            <h3 class="stat-val" id="statRevenue">0đ</h3>
+                            <span class="stat-sub">Từ đơn hàng "Hoàn tất"</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orders">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-lbl">Tổng đơn hàng</span>
+                            <h3 class="stat-val" id="statOrders">0 đơn</h3>
+                            <span class="stat-sub" id="statOrdersSub">Mới: 0 | Đang xử lý: 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon customers">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-lbl">Khách hàng</span>
+                            <h3 class="stat-val" id="statCustomers">0 người</h3>
+                            <span class="stat-sub">Có thông tin đặt hoa</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon discounts">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                        </div>
+                        <div class="stat-details">
+                            <span class="stat-lbl">Mã giảm giá</span>
+                            <h3 class="stat-val" id="statDiscounts">0 mã</h3>
+                            <span class="stat-sub" id="statDiscountsSub">Đang hoạt động</span>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- DETAILS MODAL -->
+                <!-- Dashboard Content Grid -->
+                <div class="dashboard-grid">
+                    <!-- Left Column: Revenue breakdown chart and Status stats -->
+                    <div class="dashboard-card shadow-card">
+                        <div class="card-header">
+                            <h3>Tỷ Lệ Đơn Hàng Theo Trạng Thái</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-chart-container">
+                                <!-- Status breakdown bars -->
+                                <div class="chart-progress-item">
+                                    <div class="lbl-wrap">
+                                        <span>Đã thanh toán (Mới)</span>
+                                        <strong id="barNewPct">0%</strong>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div id="barNew" class="progress-bar-fill" style="width: 0%; background: #1d4ed8;"></div>
+                                    </div>
+                                </div>
+                                <div class="chart-progress-item">
+                                    <div class="lbl-wrap">
+                                        <span>Đang xử lý & Giao hàng</span>
+                                        <strong id="barProcessingPct">0%</strong>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div id="barProcessing" class="progress-bar-fill" style="width: 0%; background: #b45309;"></div>
+                                    </div>
+                                </div>
+                                <div class="chart-progress-item">
+                                    <div class="lbl-wrap">
+                                        <span>Hoàn tất thành công</span>
+                                        <strong id="barCompletedPct">0%</strong>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div id="barCompleted" class="progress-bar-fill" style="width: 0%; background: #166534;"></div>
+                                    </div>
+                                </div>
+                                <div class="chart-progress-item">
+                                    <div class="lbl-wrap">
+                                        <span>Đã hủy bỏ</span>
+                                        <strong id="barCancelledPct">0%</strong>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div id="barCancelled" class="progress-bar-fill" style="width: 0%; background: #b91c1c;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Top selling products -->
+                    <div class="dashboard-card shadow-card">
+                        <div class="card-header">
+                            <h3>Sản Phẩm Bán Chạy Nhất</h3>
+                        </div>
+                        <div class="card-body" style="padding:0;">
+                            <div class="table-responsive">
+                                <table class="admin-table mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Danh mục</th>
+                                            <th>Đã bán</th>
+                                            <th>Doanh thu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashTopProductsTbody">
+                                        <tr><td colspan="4" class="text-center" style="padding:20px;">Đang tải dữ liệu...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Recent Orders -->
+                    <div class="dashboard-card shadow-card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h3>Đơn Hàng Mới Đặt</h3>
+                        </div>
+                        <div class="card-body" style="padding:0;">
+                            <div class="table-responsive">
+                                <table class="admin-table mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn</th>
+                                            <th>Khách hàng</th>
+                                            <th>Người nhận</th>
+                                            <th>Thời gian giao</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashRecentOrdersTbody">
+                                        <tr><td colspan="6" class="text-center" style="padding:20px;">Đang tải đơn hàng...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- SECTION 2: PRODUCT MANAGEMENT -->
+            <section class="admin-section" id="section-products">
+                <div class="section-header-wrap">
+                    <div>
+                        <h1 class="page-title">Quản Lý Danh Mục Sản Phẩm</h1>
+                        <p class="page-subtitle">Thêm mới, sửa đổi hoặc loại bỏ sản phẩm trong catalog hiển thị.</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-primary" id="btnOpenAddProductModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Thêm Sản Phẩm Mới</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btnResetDefaultProducts">
+                            <span>Khôi phục mẫu</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-toolbar">
+                    <input id="productSearch" class="admin-input" type="search" placeholder="Tìm kiếm tên sản phẩm hoặc tag...">
+
+                    <select id="productCategoryFilter" class="admin-select" aria-label="Lọc theo danh mục">
+                        <option value="all">Tất cả danh mục</option>
+                        <option value="romance">Tình Yêu & Sự Lãng Mạn</option>
+                        <option value="birthday">Sinh Nhật & Chúc Mừng</option>
+                        <option value="grand">Khai Trương & Sự Kiện</option>
+                        <option value="sympathy">Chia Buồn & Trang Trọng</option>
+                    </select>
+
+                    <div></div> <!-- spacer -->
+                    <div id="productCount" class="admin-count-lbl">0 sản phẩm</div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Hình ảnh</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th>Giá niêm yết</th>
+                                <th>Nhãn (Tag)</th>
+                                <th>Nổi bật</th>
+                                <th style="width: 140px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- SECTION 3: ORDER MANAGEMENT -->
+            <section class="admin-section" id="section-orders">
+                <div class="section-header-wrap">
+                    <div>
+                        <h1 class="page-title">Quản Lý Đơn Hàng Đã Đặt</h1>
+                        <p class="page-subtitle">Mỗi đơn sẽ tự lưu sau khi khách “Đặt hoa thành công”.</p>
+                    </div>
+                </div>
+
+                <div class="admin-toolbar">
+                    <input id="adminSearch" class="admin-input" type="search" placeholder="Tìm theo mã đơn, tên, SĐT, email, địa chỉ, sản phẩm...">
+
+                    <select id="adminStatus" class="admin-select" aria-label="Lọc trạng thái">
+                        <option value="all">Tất cả</option>
+                        <option value="new">Đã thanh toán</option>
+                        <option value="processing">Đang xử lý</option>
+                        <option value="completed">Hoàn tất</option>
+                        <option value="cancelled">Đã hủy</option>
+                    </select>
+
+                    <select id="adminSort" class="admin-select" aria-label="Sắp xếp">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                    </select>
+
+                    <div class="admin-actions">
+                        <button id="adminExportCsv" class="btn-admin primary" type="button">Export CSV</button>
+                        <button id="adminExportJson" class="btn-admin" type="button">Export JSON</button>
+                        <button id="adminSeed" class="btn-admin" type="button">Tạo demo</button>
+                        <button id="adminClearAll" class="btn-admin danger" type="button">Xóa tất cả</button>
+                    </div>
+                </div>
+
+                <div class="admin-meta">
+                    <div id="adminCount">0 đơn hàng</div>
+                    <div style="font-size:12px;color:var(--color-text-secondary);">
+                        Mẹo: Bấm “Chuyển trạng thái” để cập nhật nhanh: Mới → Đang xử lý → Hoàn tất → Đã hủy
+                    </div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <div id="adminEmpty" class="admin-empty" style="display:none;">
+                        <h3>Chưa có đơn hàng nào</h3>
+                        <p>Hãy đặt thử 1 đơn từ trang web hoặc bấm “Tạo demo”.</p>
+                    </div>
+
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Khách đặt</th>
+                                <th>Giao hàng</th>
+                                <th>Tổng cộng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- SECTION 4: CUSTOMER MANAGEMENT -->
+            <section class="admin-section" id="section-customers">
+                <div class="section-header-wrap">
+                    <div>
+                        <h1 class="page-title">Quản Lý Danh Sách Khách Hàng</h1>
+                        <p class="page-subtitle">Dữ liệu khách hàng được tổng hợp tự động dựa trên số điện thoại đặt hoa.</p>
+                    </div>
+                </div>
+
+                <div class="admin-toolbar">
+                    <input id="customerSearch" class="admin-input" type="search" placeholder="Tìm theo tên, SĐT hoặc email...">
+                    <div></div><div></div>
+                    <div id="customerCount" class="admin-count-lbl">0 khách hàng</div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Địa chỉ Email</th>
+                                <th>Tổng chi tiêu</th>
+                                <th>Đơn đã đặt</th>
+                                <th>Phân hạng</th>
+                                <th style="width: 140px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- SECTION 5: DISCOUNT MANAGEMENT -->
+            <section class="admin-section" id="section-discounts">
+                <div class="section-header-wrap">
+                    <div>
+                        <h1 class="page-title">Quản Lý Mã Giảm Giá & Khuyến Mãi</h1>
+                        <p class="page-subtitle">Tạo các mã giảm giá phần trăm hoặc số tiền cố định để khách hàng áp dụng tại trang checkout.</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-primary" id="btnOpenAddCouponModal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Tạo Mã Giảm Giá Mới</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-toolbar">
+                    <input id="couponSearch" class="admin-input" type="search" placeholder="Tìm theo mã code giảm giá...">
+                    <div></div><div></div>
+                    <div id="couponCount" class="admin-count-lbl">0 mã giảm giá</div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã CODE</th>
+                                <th>Loại giảm giá</th>
+                                <th>Mức giảm giá</th>
+                                <th>Đơn hàng tối thiểu</th>
+                                <th>Trạng thái</th>
+                                <th style="width: 140px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="couponTbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- DETAILS MODAL (ORDERS) -->
     <div class="admin-modal-overlay" id="adminModalOverlay" aria-hidden="true">
         <div class="admin-modal" role="dialog" aria-modal="true" aria-label="Chi tiết đơn hàng">
             <div class="admin-modal-header">
@@ -110,7 +435,136 @@
         </div>
     </div>
 
+    <!-- MODAL: ADD / EDIT PRODUCT -->
+    <div class="admin-modal-overlay" id="productModalOverlay" aria-hidden="true">
+        <div class="admin-modal" role="dialog" aria-modal="true" aria-label="Quản lý sản phẩm" style="width: min(650px, 100%);">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title" id="productModalTitle">Thêm Sản Phẩm Mới</h3>
+                <button class="admin-modal-close" id="btnProductModalClose" type="button">&times;</button>
+            </div>
+            <form id="productForm" class="admin-form">
+                <input type="hidden" id="prodFormId">
+                <div class="admin-form-group">
+                    <label for="prodTitle" class="form-label required">Tên hoa / sản phẩm</label>
+                    <input type="text" id="prodTitle" class="admin-input-control" required placeholder="Bó hoa hồng thơ ngây...">
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label for="prodCategory" class="form-label required">Danh mục</label>
+                        <select id="prodCategory" class="admin-select-control" required>
+                            <option value="romance">Tình Yêu & Sự Lãng Mạn</option>
+                            <option value="birthday">Sinh Nhật & Chúc Mừng</option>
+                            <option value="grand">Khai Trương & Sự Kiện</option>
+                            <option value="sympathy">Chia Buồn & Trang Trọng</option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="prodPrice" class="form-label required">Giá bán (VNĐ)</label>
+                        <input type="number" id="prodPrice" class="admin-input-control" required placeholder="750000" min="10000">
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label for="prodImage" class="form-label required">Đường dẫn ảnh (URL hoặc file)</label>
+                        <input type="text" id="prodImage" class="admin-input-control" required placeholder="images/bouquet_1.png">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="prodTag" class="form-label">Nhãn nổi bật (Tag)</label>
+                        <input type="text" id="prodTag" class="admin-input-control" placeholder="BESTSELLER, NEW, SALE...">
+                    </div>
+                </div>
+                <div class="admin-form-group">
+                    <label for="prodDescription" class="form-label required">Mô tả sản phẩm</label>
+                    <textarea id="prodDescription" class="admin-textarea-control" rows="4" required placeholder="Mô tả chất liệu hoa, ý nghĩa nghệ thuật..."></textarea>
+                </div>
+                <div class="admin-form-group checkbox-wrap">
+                    <label for="prodFeatured">
+                        <input type="checkbox" id="prodFeatured" checked>
+                        <span>Hiển thị nổi bật trên Trang chủ (Featured)</span>
+                    </label>
+                </div>
+                <div class="admin-form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnProductFormCancel">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT COUPON -->
+    <div class="admin-modal-overlay" id="couponModalOverlay" aria-hidden="true">
+        <div class="admin-modal" role="dialog" aria-modal="true" aria-label="Quản lý mã giảm giá" style="width: min(500px, 100%);">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title" id="couponModalTitle">Tạo Mã Giảm Giá Mới</h3>
+                <button class="admin-modal-close" id="btnCouponModalClose" type="button">&times;</button>
+            </div>
+            <form id="couponForm" class="admin-form">
+                <input type="hidden" id="couponFormOldCode">
+                <div class="admin-form-group">
+                    <label for="couponCode" class="form-label required">Mã giảm giá (Code)</label>
+                    <input type="text" id="couponCode" class="admin-input-control" required placeholder="WELCOME10" style="text-transform: uppercase;">
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label for="couponType" class="form-label required">Loại chiết khấu</label>
+                        <select id="couponType" class="admin-select-control" required>
+                            <option value="percentage">Giảm theo phần trăm (%)</option>
+                            <option value="fixed">Giảm số tiền cố định (VNĐ)</option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="couponValue" class="form-label required">Giá trị giảm</label>
+                        <input type="number" id="couponValue" class="admin-input-control" required placeholder="10 hoặc 50000" min="1">
+                    </div>
+                </div>
+                <div class="admin-form-group">
+                    <label for="couponMinOrder" class="form-label required">Đơn hàng tối thiểu (VNĐ)</label>
+                    <input type="number" id="couponMinOrder" class="admin-input-control" required placeholder="0" min="0">
+                </div>
+                <div class="admin-form-group checkbox-wrap">
+                    <label for="couponActive">
+                        <input type="checkbox" id="couponActive" checked>
+                        <span>Mã giảm giá đang hoạt động (Active)</span>
+                    </label>
+                </div>
+                <div class="admin-form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCouponFormCancel">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu mã giảm giá</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CUSTOMER ORDER HISTORY -->
+    <div class="admin-modal-overlay" id="customerHistoryModalOverlay" aria-hidden="true">
+        <div class="admin-modal" role="dialog" aria-modal="true" aria-label="Lịch sử mua hàng" style="width: min(850px, 100%);">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title" id="customerHistoryTitle">Lịch sử đặt hoa</h3>
+                <button class="admin-modal-close" id="btnCustomerHistoryClose" type="button">&times;</button>
+            </div>
+            <div class="admin-modal-body" style="grid-template-columns: 1fr; padding: 20px;">
+                <div class="customer-profile-card">
+                    <p>Khách hàng: <strong id="custHistName">Nguyễn Văn A</strong></p>
+                    <p>SĐT: <strong id="custHistPhone">0901234567</strong> | Email: <strong id="custHistEmail">a@example.com</strong></p>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Người nhận</th>
+                                <th>Tổng thanh toán</th>
+                                <th>Thời gian giao</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerHistoryTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="admin.js"></script>
 </body>
 </html>
-

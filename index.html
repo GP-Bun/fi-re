@@ -637,56 +637,41 @@
                         <!-- Panel: Bank QR Code -->
                         <div class="payment-panel-content" id="paymentPanelQr">
                             <div class="qr-payment-wrapper">
-                                <div class="qr-container-box">
+                                 <div class="qr-container-box">
                                     <div class="qr-code-frame">
-                                        <!-- Mock Dynamic VietQR layout with beautiful styling -->
+                                        <!-- Real VietQR Dynamic QR Code -->
                                         <div class="vietqr-header">
-                                            <span class="bank-tag">VIETCOMBANK</span>
+                                            <span class="bank-tag">MBBANK</span>
                                             <span class="fast247-logo">VietQR 247</span>
                                         </div>
                                         <div class="qr-placeholder" id="qrPlaceholderImage">
-                                            <!-- SVG for nice procedural QR representation -->
-                                            <svg width="180" height="180" viewBox="0 0 29 29" fill="black" shape-rendering="crispEdges">
-                                                <!-- Top Left Finder Pattern -->
-                                                <rect x="0" y="0" width="7" height="7"/>
-                                                <rect x="1" y="1" width="5" height="5" fill="white"/>
-                                                <rect x="2" y="2" width="3" height="3"/>
-                                                <!-- Top Right Finder Pattern -->
-                                                <rect x="22" y="0" width="7" height="7"/>
-                                                <rect x="23" y="1" width="5" height="5" fill="white"/>
-                                                <rect x="24" y="2" width="3" height="3"/>
-                                                <!-- Bottom Left Finder Pattern -->
-                                                <rect x="0" y="22" width="7" height="7"/>
-                                                <rect x="1" y="23" width="5" height="5" fill="white"/>
-                                                <rect x="2" y="24" width="3" height="3"/>
-                                                <!-- Timing Patterns & Fake data pixels -->
-                                                <rect x="8" y="2" width="1" height="1"/><rect x="12" y="2" width="1" height="1"/><rect x="16" y="2" width="1" height="1"/><rect x="20" y="2" width="1" height="1"/>
-                                                <rect x="9" y="4" width="2" height="1"/><rect x="14" y="4" width="1" height="1"/><rect x="18" y="4" width="3" height="1"/>
-                                                <rect x="8" y="8" width="1" height="1"/><rect x="11" y="8" width="2" height="2"/><rect x="15" y="8" width="1" height="1"/><rect x="21" y="8" width="2" height="1"/>
-                                                <rect x="9" y="11" width="1" height="3"/><rect x="13" y="12" width="3" height="1"/><rect x="18" y="10" width="2" height="2"/>
-                                                <rect x="25" y="15" width="2" height="2"/><rect x="10" y="18" width="4" height="1"/><rect x="17" y="18" width="1" height="3"/>
-                                                <rect x="22" y="22" width="1" height="1"/><rect x="26" y="23" width="2" height="1"/><rect x="25" y="26" width="3" height="2"/>
-                                                <rect x="12" y="25" width="3" height="3"/><rect x="8" y="27" width="1" height="1"/><rect x="19" y="26" width="2" height="1"/>
-                                            </svg>
+                                            <img
+                                                id="vietqrImg"
+                                                src="https://img.vietqr.io/image/MB-091604468-compact2.png?amount=0&addInfo=FIORE000000&accountName=NGO%20THUY%20VAN"
+                                                alt="Mã QR Chuyển khoản MBBank"
+                                                style="width:180px;height:180px;object-fit:contain;border-radius:8px;"
+                                                onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';"
+                                            >
+                                            <div id="qrFallback" style="display:none;width:180px;height:180px;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#52796F;font-size:12px;text-align:center;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/></svg>
+                                                <span>Quét mã qua app ngân hàng</span>
+                                            </div>
                                             <div class="qr-center-icon">F</div>
                                         </div>
-                                        <div class="vietqr-footer">
-                                            <span>Quét để thanh toán bằng ứng dụng ngân hàng</span>
-                                        </div>
                                     </div>
-                                    
+
                                     <div class="qr-payment-details">
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Ngân hàng thụ hưởng:</span>
-                                            <strong class="qr-val">Vietcombank (VCB)</strong>
+                                            <strong class="qr-val">MBBank (MB)</strong>
                                         </div>
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Chủ tài khoản:</span>
-                                            <strong class="qr-val">Fióre Shop</strong>
+                                            <strong class="qr-val">Ngô Thủy Vân</strong>
                                         </div>
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Số tài khoản:</span>
-                                            <strong class="qr-val copyable" id="qrAccountNumber">1038 9898 7777</strong>
+                                            <strong class="qr-val copyable" id="qrAccountNumber">091604468</strong>
                                         </div>
                                         <div class="qr-detail-item">
                                             <span class="qr-lbl">Số tiền cần chuyển:</span>
@@ -698,6 +683,7 @@
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <div class="qr-alert-box">
                                     <div class="spinner-circle-small"></div>
@@ -800,12 +786,60 @@
                             <span>Phí vận chuyển:</span>
                             <span id="checkoutSummaryShipping">Miễn phí</span>
                         </div>
+                        <!-- PROMO CODE SECTION -->
+                        <div class="promo-code-wrap">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" id="promoCodeInput" class="form-control" placeholder="Mã giảm giá (WELCOME10...)">
+                                    <button type="button" id="btnApplyPromo" class="btn btn-secondary">Áp dụng</button>
+                                </div>
+                            </div>
+                            <div id="promoFeedback" style="font-size: 12px; display: none; margin-top: 4px;"></div>
+                        </div>
+                        <div class="summary-totals-row" id="discountTotalRow" style="display: none; color: var(--color-brand-rose); font-weight: 650;">
+                            <span>Giảm giá (<span id="appliedPromoLabel"></span>):</span>
+                            <span id="checkoutSummaryDiscount">-0đ</span>
+                        </div>
                         <div class="summary-totals-row final-grand-total">
                             <span>Tổng cộng:</span>
                             <span id="checkoutSummaryTotal">0đ</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHATBOT WIDGET -->
+    <div class="fiore-chatbot-container" id="fioreChatbotContainer">
+        <!-- Chatbot Button (FAB) -->
+        <button class="chatbot-fab" id="chatbotFab" aria-label="Trợ lý tư vấn Fióre">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span class="chatbot-pulse-dot"></span>
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-bot-info">
+                    <div class="chatbot-avatar">F</div>
+                    <div>
+                        <h4 class="chatbot-name" style="color: #FAF7F2; margin: 0; font-size: 13.5px; font-weight: 650;">Fióre Florist Assistant</h4>
+                        <span class="chatbot-status" style="color: #4ade80;">Đang trực tuyến</span>
+                    </div>
+                </div>
+                <button class="chatbot-close-btn" id="chatbotCloseBtn" aria-label="Đóng khung chat">&times;</button>
+            </div>
+            
+            <div class="chatbot-messages" id="chatbotMessages">
+                <!-- Messages dynamically rendered -->
+            </div>
+
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbotInput" placeholder="Nhập câu hỏi của bạn..." autocomplete="off">
+                <button type="button" id="chatbotSendBtn" aria-label="Gửi">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
             </div>
         </div>
     </div>
