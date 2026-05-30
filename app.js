@@ -45,9 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const SAVED_CARD_STORAGE_KEY = 'fiore_saved_card_number';
     const SAVED_CARD_HOLDER_KEY = 'fiore_saved_card_holder';
     const SAVED_CARD_EXPIRY_KEY = 'fiore_saved_card_expiry';
-    const ADMIN_AUTH_SESSION_KEY = 'fiore_admin_authed';
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'admin123';
 
     function readOrdersFromStorage() {
         try {
@@ -252,14 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutSummaryShipping = document.getElementById('checkoutSummaryShipping');
     const checkoutSummaryTotal = document.getElementById('checkoutSummaryTotal');
 
-    // Admin Login Modal
+    // Admin Link
     const adminAccessBtn = document.getElementById('adminAccessBtn');
-    const adminLoginOverlay = document.getElementById('adminLoginOverlay');
-    const closeAdminLogin = document.getElementById('closeAdminLogin');
-    const adminLoginForm = document.getElementById('adminLoginForm');
-    const adminUsername = document.getElementById('adminUsername');
-    const adminPassword = document.getElementById('adminPassword');
-    const adminLoginError = document.getElementById('adminLoginError');
 
 
     function getTagClass(tag) {
@@ -574,66 +565,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 7a. ADMIN ACCESS FROM CART ---
-    function isAdminAuthed() {
-        try {
-            return sessionStorage.getItem(ADMIN_AUTH_SESSION_KEY) === 'true';
-        } catch {
-            return false;
-        }
-    }
-
-    function setAdminAuthed() {
-        sessionStorage.setItem(ADMIN_AUTH_SESSION_KEY, 'true');
-    }
-
-    function openAdminLogin() {
-        if (!adminLoginOverlay) return;
-        if (adminLoginError) {
-            adminLoginError.style.display = 'none';
-            adminLoginError.textContent = '';
-        }
-        if (adminUsername) adminUsername.value = '';
-        if (adminPassword) adminPassword.value = '';
-        adminLoginOverlay.classList.add('open');
-        setTimeout(() => adminUsername?.focus(), 0);
-    }
-
-    function closeAdminLoginModal() {
-        adminLoginOverlay?.classList.remove('open');
-    }
-
     if (adminAccessBtn) {
         adminAccessBtn.addEventListener('click', () => {
-            if (isAdminAuthed()) {
-                window.location.href = 'admin.html';
-                return;
-            }
-            openAdminLogin();
+            window.location.href = 'admin.html';
         });
     }
-
-    closeAdminLogin?.addEventListener('click', closeAdminLoginModal);
-    adminLoginOverlay?.addEventListener('click', (e) => {
-        if (e.target === adminLoginOverlay) closeAdminLoginModal();
-    });
-
-    adminLoginForm?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const u = (adminUsername?.value || '').trim();
-        const p = (adminPassword?.value || '').trim();
-
-        if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
-            setAdminAuthed();
-            closeAdminLoginModal();
-            window.location.href = 'admin.html';
-            return;
-        }
-
-        if (adminLoginError) {
-            adminLoginError.textContent = 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.';
-            adminLoginError.style.display = 'block';
-        }
-    });
 
     // Sticky Header Scroll effect
     window.addEventListener('scroll', () => {

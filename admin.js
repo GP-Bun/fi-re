@@ -5,15 +5,54 @@
 (() => {
     // Authenticate check
     const ADMIN_AUTH_SESSION_KEY = 'fiore_admin_authed';
+    
+    let isAuthed = false;
     try {
-        if (sessionStorage.getItem(ADMIN_AUTH_SESSION_KEY) !== 'true') {
-            window.location.href = 'index.html';
-            return;
+        isAuthed = sessionStorage.getItem(ADMIN_AUTH_SESSION_KEY) === 'true';
+    } catch {}
+
+    if (!isAuthed) {
+        // Show login screen, hide main content
+        const loginContent = document.getElementById('adminLoginContent');
+        const mainContent = document.getElementById('adminMainContent');
+        if (loginContent) loginContent.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+
+        // Bind login form
+        const loginForm = document.getElementById('adminLoginForm');
+        const usernameInput = document.getElementById('adminUser');
+        const passwordInput = document.getElementById('adminPass');
+        const errorMsg = document.getElementById('adminLoginError');
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const user = usernameInput ? usernameInput.value.trim() : '';
+                const pass = passwordInput ? passwordInput.value : '';
+
+                if (user === 'admin' && pass === 'admin123') {
+                    try {
+                        sessionStorage.setItem(ADMIN_AUTH_SESSION_KEY, 'true');
+                        window.location.reload();
+                    } catch (err) {
+                        alert('Không thể lưu phiên đăng nhập. Vui lòng kiểm tra cài đặt trình duyệt.');
+                    }
+                } else {
+                    if (errorMsg) {
+                        errorMsg.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
+                        errorMsg.style.display = 'block';
+                    }
+                }
+            });
         }
-    } catch {
-        window.location.href = 'index.html';
         return;
     }
+
+    // If authenticated, show main content, hide login screen
+    const loginContent = document.getElementById('adminLoginContent');
+    const mainContent = document.getElementById('adminMainContent');
+    if (loginContent) loginContent.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
 
     // Storage Keys
     const ORDERS_KEY = 'fiore_orders';

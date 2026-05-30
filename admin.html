@@ -15,8 +15,10 @@
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-    <!-- HEADER -->
-    <header class="main-header scrolled" id="mainHeader">
+    <!-- ADMIN MAIN CONTAINER WRAPPER -->
+    <div id="adminMainContent" style="display: none;">
+        <!-- HEADER -->
+        <header class="main-header scrolled" id="mainHeader">
         <div class="header-container">
             <a href="index.html" class="logo">
                 <span class="logo-accent">F</span>ióre <span class="admin-badge">Admin</span>
@@ -561,6 +563,48 @@
                         <tbody id="customerHistoryTbody"></tbody>
                     </table>
                 </div>
+            </div>
+    </div><!-- end adminMainContent -->
+
+    <!-- STANDALONE PREMIUM ADMIN LOGIN SCREEN -->
+    <div id="adminLoginContent" class="admin-login-screen" style="display: none;">
+        <div class="login-card">
+            <a href="index.html" class="login-logo">
+                <span class="logo-accent">F</span>ióre <span class="admin-badge" style="margin-left: 2px;">Admin</span>
+            </a>
+            <p class="login-subtitle">Hệ thống quản trị cửa hàng hoa tươi cao cấp</p>
+            
+            <div id="adminLoginError" class="login-error"></div>
+            
+            <form id="adminLoginForm">
+                <div class="login-form-group">
+                    <label for="adminUser">Tên đăng nhập</label>
+                    <div class="login-input-wrapper">
+                        <input type="text" id="adminUser" class="login-input" required placeholder="admin" autocomplete="username">
+                        <span class="login-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="login-form-group">
+                    <label for="adminPass">Mật khẩu</label>
+                    <div class="login-input-wrapper">
+                        <input type="password" id="adminPass" class="login-input" required placeholder="••••••••" autocomplete="current-password">
+                        <span class="login-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn">Đăng nhập</button>
+            </form>
+            
+            <div class="login-footer">
+                <a href="index.html" class="login-back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Quay lại trang chủ
+                </a>
             </div>
         </div>
     </div>
