@@ -639,6 +639,10 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                                         <span>Quay lại</span>
                                     </button>
+                                    <button type="button" class="btn btn-primary" id="btnSimulateQrPay">
+                                        <span>Giả Lập Đã Chuyển Tiền (Test)</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -710,7 +714,18 @@
                     </div>
                 </div>
 
-                
+                <!-- Checkout Sidebar Summary -->
+                <div class="checkout-sidebar-summary" id="checkoutSummaryPanel">
+                    <h4 class="summary-title">Tóm Tắt Đơn Hàng</h4>
+                    <div class="summary-items-list" id="checkoutSummaryItems">
+                        <!-- Items rendered dynamically -->
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="summary-totals-row">
+                            <span>Tạm tính:</span>
+                            <span id="checkoutSummarySubtotal">0đ</span>
+                        </div>
                         <div class="summary-totals-row">
                             <span>Phí vận chuyển:</span>
                             <span id="checkoutSummaryShipping">Miễn phí</span>

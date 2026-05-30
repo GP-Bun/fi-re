@@ -720,6 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 9. STEP-BY-STEP CHECKOUT FLOW ---
 
+    if (checkoutTriggerBtn) {
     checkoutTriggerBtn.addEventListener('click', () => {
         if (cart.length === 0) return;
         
@@ -741,6 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
             openCheckoutModalFunc();
         }, 350);
     });
+    }
 
     function openCheckoutModalFunc() {
         checkoutStep = 1;
@@ -801,6 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateCheckoutSummary() {
+        if (!checkoutSummaryItems) return;
         checkoutSummaryItems.innerHTML = '';
         let subtotal = 0;
         
@@ -852,12 +855,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const total = Math.max(0, subtotal + shippingFee - discount);
 
-        checkoutSummarySubtotal.textContent = formatCurrency(subtotal);
-        checkoutSummaryShipping.textContent = shippingFee === 0 ? 'Miễn phí' : formatCurrency(shippingFee);
-        checkoutSummaryTotal.textContent = formatCurrency(total);
+        if (checkoutSummarySubtotal) checkoutSummarySubtotal.textContent = formatCurrency(subtotal);
+        if (checkoutSummaryShipping) checkoutSummaryShipping.textContent = shippingFee === 0 ? 'Miễn phí' : formatCurrency(shippingFee);
+        if (checkoutSummaryTotal) checkoutSummaryTotal.textContent = formatCurrency(total);
         
         // Step 2 QR payments updates
-        qrPaymentAmount.textContent = formatCurrency(total);
+        if (qrPaymentAmount) qrPaymentAmount.textContent = formatCurrency(total);
         // Auto-refresh VietQR with new amount (transfer message set later when step 2 opens)
         const currentMsg = qrTransferMessage ? qrTransferMessage.textContent : 'FIORE';
         updateVietQR(total, currentMsg);
