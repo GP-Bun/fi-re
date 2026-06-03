@@ -1906,9 +1906,72 @@ textarea:focus {
 /* PAYMENT METHODS CHOOSE */
 .payment-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-bottom: 2.5rem;
+}
+
+/* VNPay checkout panel */
+.vnpay-payment-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.vnpay-brand-box h4 {
+    margin: 0 0 8px;
+    color: var(--color-brand-green);
+    font-family: var(--font-display);
+}
+
+.vnpay-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+}
+
+.vnpay-amount-box {
+    background: linear-gradient(135deg, rgba(28, 53, 45, 0.04), rgba(201, 168, 124, 0.12));
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+}
+
+.vnpay-amount-label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.vnpay-amount-value {
+    font-size: 1.5rem;
+    color: var(--color-brand-rose);
+    font-weight: 700;
+}
+
+.vnpay-sandbox-hint {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    background: #faf9f6;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 12px 14px;
+    line-height: 1.5;
+}
+
+.vnpay-sandbox-hint ul {
+    margin: 8px 0 0;
+    padding-left: 1.2rem;
+}
+
+.vnpay-logo {
+    max-height: 36px;
+    margin-bottom: 10px;
 }
 
 .payment-tab-btn {

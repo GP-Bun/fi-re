@@ -2,19 +2,6 @@
    FIÒRE BOUTIQUE DE FLEURS - JAVASCRIPT CONTROLLER
    ========================================================================== */
 
-/* ============================================================
-   EMAILJS CONFIGURATION
-   Thay các giá trị bên dưới bằng thông tin từ tài khoản EmailJS của bạn.
-   Xem hướng dẫn chi tiết tại: https://www.emailjs.com/docs/
-   ============================================================ */
-const EMAILJS_CONFIG = {
-    publicKey:          'dGSBNHhWHnMI8oIZ-',          // Lấy từ Account > API Keys
-    serviceId:          'service_z9ucei6',          // Lấy từ Email Services
-    customerTemplateId: 'template_14f3loq', // Template gửi cho khách hàng
-    storeTemplateId:    'template_a7n2f3l',    // Template gửi cho cửa hàng
-    storeEmail:         'thuyvanngo35@gmail.com'           // Email nhận đơn hàng của cửa hàng
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. PRODUCT DATABASE (shared via products.js) ---
@@ -36,15 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let cart = JSON.parse(localStorage.getItem('fiore_cart')) || [];
     let currentSelectedProduct = null;
     let checkoutStep = 1;
-    let selectedPaymentMethod = 'card'; // 'card' or 'qr'
+    let selectedPaymentMethod = 'qr'; // 'qr' | 'vnpay'
     let qrSimulateInterval = null;
     let appliedCoupon = null; // State of applied promo/discount code
 
     // --- 2a. ORDERS STORAGE (ADMIN) ---
     const ORDERS_STORAGE_KEY = 'fiore_orders';
-    const SAVED_CARD_STORAGE_KEY = 'fiore_saved_card_number';
-    const SAVED_CARD_HOLDER_KEY = 'fiore_saved_card_holder';
-    const SAVED_CARD_EXPIRY_KEY = 'fiore_saved_card_expiry';
 
     function readOrdersFromStorage() {
         try {
@@ -64,63 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const orders = readOrdersFromStorage();
         orders.unshift(order); // newest first
         writeOrdersToStorage(orders);
-    }
-
-    function getSavedCardDigits() {
-        try {
-            const raw = localStorage.getItem(SAVED_CARD_STORAGE_KEY) || '';
-            const digits = raw.replace(/\D/g, '');
-            return digits.length === 16 ? digits : '';
-        } catch {
-            return '';
-        }
-    }
-
-    function setSavedCardDigits(digits16) {
-        const digits = (digits16 || '').replace(/\D/g, '').slice(0, 16);
-        if (digits.length !== 16) return;
-        localStorage.setItem(SAVED_CARD_STORAGE_KEY, digits);
-    }
-
-    function clearSavedCardDigits() {
-        localStorage.removeItem(SAVED_CARD_STORAGE_KEY);
-    }
-
-    function getSavedCardHolder() {
-        try {
-            return (localStorage.getItem(SAVED_CARD_HOLDER_KEY) || '').toString();
-        } catch {
-            return '';
-        }
-    }
-
-    function setSavedCardHolder(holder) {
-        const v = (holder || '').toString().trim();
-        if (!v) return;
-        localStorage.setItem(SAVED_CARD_HOLDER_KEY, v);
-    }
-
-    function clearSavedCardHolder() {
-        localStorage.removeItem(SAVED_CARD_HOLDER_KEY);
-    }
-
-    function getSavedCardExpiry() {
-        try {
-            const raw = (localStorage.getItem(SAVED_CARD_EXPIRY_KEY) || '').toString().trim();
-            return /^\d{2}\/\d{2}$/.test(raw) ? raw : '';
-        } catch {
-            return '';
-        }
-    }
-
-    function setSavedCardExpiry(expiry) {
-        const v = (expiry || '').toString().trim();
-        if (!/^\d{2}\/\d{2}$/.test(v)) return;
-        localStorage.setItem(SAVED_CARD_EXPIRY_KEY, v);
-    }
-
-    function clearSavedCardExpiry() {
-        localStorage.removeItem(SAVED_CARD_EXPIRY_KEY);
     }
 
     // --- 3. DOM ELEMENTS ---
@@ -186,24 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutCardMessage = document.getElementById('checkoutCardMessage');
     
     // Step 2 Tabs & Panels
-    const tabBtnCard = document.getElementById('tabBtnCard');
     const tabBtnQr = document.getElementById('tabBtnQr');
-    const paymentPanelCard = document.getElementById('paymentPanelCard');
+    const tabBtnVnpay = document.getElementById('tabBtnVnpay');
     const paymentPanelQr = document.getElementById('paymentPanelQr');
-    
-    // Card fields & interactive card
-    const creditCardPreview = document.getElementById('creditCardPreview');
-    const creditCardForm = document.getElementById('creditCardForm');
-    const cardNumberInput = document.getElementById('cardNumber');
-    const cardHolderInput = document.getElementById('cardHolder');
-    const cardExpiryInput = document.getElementById('cardExpiry');
-    const cardCvvInput = document.getElementById('cardCvv');
-    
-    const cardNumDisplay = document.getElementById('cardNumDisplay');
-    const cardHolderDisplay = document.getElementById('cardHolderDisplay');
-    const cardExpiryDisplay = document.getElementById('cardExpiryDisplay');
-    const cardCvvDisplay = document.getElementById('cardCvvDisplay');
-    
+    const paymentPanelVnpay = document.getElementById('paymentPanelVnpay');
+    const btnVnpayCheckout = document.getElementById('btnVnpayCheckout');
+    const vnpayAmountDisplay = document.getElementById('vnpayAmountDisplay');
+    const vnpayPaymentError = document.getElementById('vnpayPaymentError');
+
     // QR fields & copyable elements
     const qrPaymentAmount = document.getElementById('qrPaymentAmount');
     const qrTransferMessage = document.getElementById('qrTransferMessage');
@@ -746,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openCheckoutModalFunc() {
         checkoutStep = 1;
-        selectedPaymentMethod = 'card';
+        selectedPaymentMethod = 'qr';
         
         updateCheckoutStepsIndicator();
         updateCheckoutSummary();
@@ -755,10 +672,6 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutStep1.classList.add('active');
         checkoutStep2.classList.remove('active');
         checkoutStep3.classList.remove('active');
-
-        cardCvvInput.value = '';
-        cardCvvDisplay.textContent = '•••';
-        creditCardPreview.classList.remove('flipped');
 
         if (window.FioreAuth) {
             window.FioreAuth.prefillCheckoutForm();
@@ -855,6 +768,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const total = Math.max(0, subtotal + shippingFee - discount);
 
+        if (vnpayAmountDisplay && checkoutStep === 2 && selectedPaymentMethod === 'vnpay') {
+            vnpayAmountDisplay.textContent = formatCurrency(total);
+        }
+
         if (checkoutSummarySubtotal) checkoutSummarySubtotal.textContent = formatCurrency(subtotal);
         if (checkoutSummaryShipping) checkoutSummaryShipping.textContent = shippingFee === 0 ? 'Miễn phí' : formatCurrency(shippingFee);
         if (checkoutSummaryTotal) checkoutSummaryTotal.textContent = formatCurrency(total);
@@ -864,6 +781,175 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-refresh VietQR with new amount (transfer message set later when step 2 opens)
         const currentMsg = qrTransferMessage ? qrTransferMessage.textContent : 'FIORE';
         updateVietQR(total, currentMsg);
+    }
+
+    function computeCheckoutTotals() {
+        let subtotal = cart.reduce((sum, item) => sum + item.singlePrice * item.quantity, 0);
+        const shippingLimit = 1000000;
+        const shippingFee = subtotal >= shippingLimit ? 0 : 50000;
+        let discount = 0;
+
+        if (appliedCoupon && subtotal >= (appliedCoupon.minOrder || 0)) {
+            if (appliedCoupon.type === 'percentage') {
+                discount = Math.round((subtotal * (appliedCoupon.value || 0)) / 100);
+            } else if (appliedCoupon.type === 'fixed') {
+                discount = appliedCoupon.value || 0;
+            }
+            discount = Math.min(discount, subtotal);
+        }
+
+        const total = Math.max(0, subtotal + shippingFee - discount);
+        return { subtotal, shippingFee, discount, total };
+    }
+
+    function showVnpayError(msg) {
+        if (!vnpayPaymentError) return;
+        if (!msg) {
+            vnpayPaymentError.style.display = 'none';
+            vnpayPaymentError.textContent = '';
+            return;
+        }
+        vnpayPaymentError.textContent = msg;
+        vnpayPaymentError.style.display = 'block';
+    }
+
+    function collectVnpayPendingOrder(totals) {
+        const deliveryDateVal = document.getElementById('deliveryDate').value;
+        const dateObj = new Date(deliveryDateVal);
+        const formattedDate = Number.isNaN(dateObj.getTime())
+            ? deliveryDateVal
+            : `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()}`;
+
+        const cartSnapshot = [...cart];
+        const orderId = `FIORE-${Math.floor(100000 + Math.random() * 900000)}`;
+        const txnRef = `${orderId}`.replace(/[^a-zA-Z0-9]/g, '').slice(0, 50);
+
+        return {
+            txnRef,
+            orderId,
+            totalText: formatCurrency(totals.total),
+            totalAmount: totals.total,
+            cardMessage: checkoutCardMessage.value.trim() || 'Không kèm lời chúc',
+            discountCode: appliedCoupon ? appliedCoupon.code : null,
+            discountAmount: appliedCoupon
+                ? (function () {
+                    let disc = 0;
+                    if (appliedCoupon.type === 'percentage') {
+                        disc = Math.round((totals.subtotal * appliedCoupon.value) / 100);
+                    } else {
+                        disc = appliedCoupon.value;
+                    }
+                    return Math.min(disc, totals.subtotal);
+                })()
+                : 0,
+            sender: {
+                name: document.getElementById('senderName').value.trim(),
+                phone: document.getElementById('senderPhone').value.trim(),
+                email: document.getElementById('senderEmail').value.trim()
+            },
+            recipient: {
+                name: document.getElementById('recipientName').value.trim(),
+                phone: document.getElementById('recipientPhone').value.trim(),
+                address: document.getElementById('recipientAddress').value.trim()
+            },
+            delivery: {
+                dateRaw: deliveryDateVal,
+                date: formattedDate,
+                timeSlot: document.getElementById('deliveryTimeSlot').value
+            },
+            items: cartSnapshot.map((item) => ({
+                id: item.id,
+                title: item.title,
+                size: item.size,
+                singlePrice: item.singlePrice,
+                quantity: item.quantity,
+                image: item.image,
+                cardMessage: item.cardMessage || ''
+            }))
+        };
+    }
+
+    function updateVnpayPanel() {
+        const totals = computeCheckoutTotals();
+        if (vnpayAmountDisplay) {
+            vnpayAmountDisplay.textContent = formatCurrency(totals.total);
+        }
+        showVnpayError('');
+    }
+
+    function switchPaymentTab(method) {
+        selectedPaymentMethod = method;
+        clearInterval(qrSimulateInterval);
+
+        if (tabBtnQr) tabBtnQr.classList.toggle('active', method === 'qr');
+        if (tabBtnVnpay) tabBtnVnpay.classList.toggle('active', method === 'vnpay');
+        if (paymentPanelQr) paymentPanelQr.classList.toggle('active', method === 'qr');
+        if (paymentPanelVnpay) paymentPanelVnpay.classList.toggle('active', method === 'vnpay');
+
+        if (method === 'qr') startQrSimulation();
+        if (method === 'vnpay') updateVnpayPanel();
+    }
+
+    async function startVnPayCheckout() {
+        showVnpayError('');
+
+        if (!shippingForm.checkValidity()) {
+            shippingForm.reportValidity();
+            return;
+        }
+
+        if (cart.length === 0) {
+            showVnpayError('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.');
+            return;
+        }
+
+        const totals = computeCheckoutTotals();
+        if (totals.total < 1000) {
+            showVnpayError('Số tiền thanh toán tối thiểu là 1.000đ.');
+            return;
+        }
+
+        const pending = collectVnpayPendingOrder(totals);
+        const orderInfo = `Thanh toan don hang ${pending.txnRef} FIORE`;
+
+        try {
+            if (btnVnpayCheckout) {
+                btnVnpayCheckout.disabled = true;
+                btnVnpayCheckout.innerHTML =
+                    '<div class="spinner-circle-small" style="border-top-color:#FAF7F2"></div> <span>Đang chuyển VNPay...</span>';
+            }
+
+            const res = await fetch('/api/vnpay/create-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: totals.total,
+                    txnRef: pending.txnRef,
+                    orderInfo
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                        'Không tạo được liên kết VNPay. Chạy npm run dev và cấu hình file .env.'
+                );
+            }
+
+            sessionStorage.setItem('fiore_vnpay_pending', JSON.stringify(pending));
+            window.location.href = data.paymentUrl;
+        } catch (err) {
+            showVnpayError(err.message || 'Lỗi kết nối VNPay.');
+            if (btnVnpayCheckout) {
+                btnVnpayCheckout.disabled = false;
+                btnVnpayCheckout.innerHTML = `
+                    <span>Thanh Toán Qua VNPay</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                `;
+            }
+        }
     }
 
     // Step 1: Submit Form to go to Step 2
@@ -887,13 +973,8 @@ document.addEventListener('DOMContentLoaded', () => {
             (checkoutSummaryTotal?.textContent || '0').replace(/[^\d]/g, '')
         ) || 0;
         updateVietQR(currentTotal, transferMsg);
-        
-        setupCardPaymentFields();
-
-        // If QR is selected, begin checking fake interval (in 10 seconds auto checkout)
-        if (selectedPaymentMethod === 'qr') {
-            startQrSimulation();
-        }
+        updateVnpayPanel();
+        switchPaymentTab(selectedPaymentMethod === 'vnpay' ? 'vnpay' : 'qr');
     });
 
     // Back to Step 1 Buttons
@@ -909,250 +990,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- 10. METHOD SELECTION TABS IN STEP 2 ---
-    tabBtnCard.addEventListener('click', () => {
-        selectedPaymentMethod = 'card';
-        tabBtnCard.classList.add('active');
-        tabBtnQr.classList.remove('active');
-        paymentPanelCard.classList.add('active');
-        paymentPanelQr.classList.remove('active');
-        clearInterval(qrSimulateInterval);
-        setupCardPaymentFields();
-    });
-
-    tabBtnQr.addEventListener('click', () => {
-        selectedPaymentMethod = 'qr';
-        tabBtnQr.classList.add('active');
-        tabBtnCard.classList.remove('active');
-        paymentPanelQr.classList.add('active');
-        paymentPanelCard.classList.remove('active');
-        startQrSimulation();
-    });
-
-
-    // --- 11. INTERACTIVE 3D CREDIT CARD EFFECT ---
-
-    const cardBindingNotice = document.getElementById('cardBindingNotice');
-    const cardPaymentError = document.getElementById('cardPaymentError');
-    const btnChangeCardNumber = document.getElementById('btnChangeCardNumber');
-
-    function showCardPaymentError(msg) {
-        if (!cardPaymentError) return;
-        if (!msg) {
-            cardPaymentError.style.display = 'none';
-            cardPaymentError.textContent = '';
-            return;
-        }
-        cardPaymentError.textContent = msg;
-        cardPaymentError.style.display = 'block';
+    if (tabBtnQr) {
+        tabBtnQr.addEventListener('click', () => switchPaymentTab('qr'));
+    }
+    if (tabBtnVnpay) {
+        tabBtnVnpay.addEventListener('click', () => switchPaymentTab('vnpay'));
+    }
+    if (btnVnpayCheckout) {
+        btnVnpayCheckout.addEventListener('click', () => startVnPayCheckout());
     }
 
-    function showCardBindingNotice(msg) {
-        if (!cardBindingNotice) return;
-        if (!msg) {
-            cardBindingNotice.hidden = true;
-            cardBindingNotice.textContent = '';
-            return;
-        }
-        cardBindingNotice.textContent = msg;
-        cardBindingNotice.hidden = false;
-    }
 
-    function resetCardFieldsEditable() {
-        cardNumberInput.readOnly = false;
-        delete cardNumberInput.dataset.locked;
-        cardHolderInput.readOnly = false;
-        cardExpiryInput.readOnly = false;
-    }
-
-    function setupCardPaymentFields() {
-        showCardPaymentError('');
-        resetCardFieldsEditable();
-        cardCvvInput.value = '';
-        cardCvvDisplay.textContent = '•••';
-        creditCardPreview.classList.remove('flipped');
-
-        const auth = window.FioreAuth;
-        const user = auth?.getCurrentUser?.();
-
-        if (!user) {
-            showCardBindingNotice('Vui lòng đăng nhập để thanh toán bằng thẻ Visa.');
-            cardNumberInput.value = '';
-            cardNumberInput.placeholder = '4111 2222 3333 4444';
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-            cardHolderInput.value = '';
-            cardHolderDisplay.textContent = 'NGUYEN VAN A';
-            cardExpiryInput.value = '';
-            cardExpiryDisplay.textContent = 'MM/YY';
-            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
-            return;
-        }
-
-        const bound = auth.getBoundCard(user.id);
-
-        if (bound) {
-            cardNumberInput.value = '';
-            cardNumberInput.placeholder = `Nhập lại số thẻ kết thúc ${bound.digits.slice(-4)}`;
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-            showCardBindingNotice(
-                `Mỗi tài khoản chỉ dùng một thẻ (•••• ${bound.digits.slice(-4)}). ` +
-                `Bạn phải nhập lại đúng số thẻ đã đăng ký lần đầu. CVV nhập mới mỗi lần thanh toán.`
-            );
-            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
-
-            if (bound.holder) {
-                cardHolderInput.value = bound.holder;
-                cardHolderDisplay.textContent = bound.holder;
-                cardHolderInput.readOnly = true;
-            } else {
-                cardHolderInput.value = '';
-                cardHolderInput.readOnly = false;
-                cardHolderDisplay.textContent = 'NGUYEN VAN A';
-            }
-
-            if (bound.expiry) {
-                cardExpiryInput.value = bound.expiry;
-                cardExpiryDisplay.textContent = bound.expiry;
-                cardExpiryInput.readOnly = true;
-            } else {
-                cardExpiryInput.value = '';
-                cardExpiryInput.readOnly = false;
-                cardExpiryDisplay.textContent = 'MM/YY';
-            }
-        } else {
-            showCardBindingNotice(
-                'Lần thanh toán đầu tiên: số thẻ sẽ được gắn cố định với tài khoản. ' +
-                'Từ lần sau bạn phải nhập lại đúng số thẻ đó mới thanh toán được.'
-            );
-            cardNumberInput.value = '';
-            cardNumberInput.placeholder = '4111 2222 3333 4444';
-            cardNumDisplay.textContent = '•••• •••• •••• ••••';
-            cardHolderInput.value = '';
-            cardHolderInput.readOnly = false;
-            cardHolderDisplay.textContent = 'NGUYEN VAN A';
-            cardExpiryInput.value = '';
-            cardExpiryInput.readOnly = false;
-            cardExpiryDisplay.textContent = 'MM/YY';
-            if (btnChangeCardNumber) btnChangeCardNumber.style.display = 'none';
-        }
-    }
-
-    function validateCardPayment() {
-        const auth = window.FioreAuth;
-        const user = auth?.getCurrentUser?.();
-
-        if (!user) {
-            return { ok: false, message: 'Vui lòng đăng nhập để thanh toán bằng thẻ Visa.' };
-        }
-
-        const digits = (cardNumberInput.value || '').replace(/\D/g, '').slice(0, 16);
-        if (digits.length !== 16) {
-            return { ok: false, message: 'Vui lòng nhập đủ 16 số thẻ.' };
-        }
-
-        const cvv = (cardCvvInput.value || '').replace(/\D/g, '');
-        if (cvv.length < 3) {
-            return { ok: false, message: 'Vui lòng nhập mã CVV (3 số).' };
-        }
-
-        const holder = (cardHolderInput.value || '').trim().toUpperCase();
-        if (!holder) {
-            return { ok: false, message: 'Vui lòng nhập tên trên thẻ.' };
-        }
-
-        const expiry = (cardExpiryInput.value || '').trim();
-        if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-            return { ok: false, message: 'Ngày hết hạn không hợp lệ (MM/YY).' };
-        }
-
-        const bound = auth.getBoundCard(user.id);
-        if (bound && digits !== bound.digits) {
-            return {
-                ok: false,
-                message: `Số thẻ không đúng. Tài khoản chỉ chấp nhận thẻ kết thúc ${bound.digits.slice(-4)}.`
-            };
-        }
-
-        return { ok: true, digits, holder, expiry, user, isFirstBind: !bound };
-    }
-
-    cardNumberInput.addEventListener('input', (e) => {
-        const formatted = formatCardNumber(e.target.value);
-        e.target.value = formatted;
-        cardNumDisplay.textContent = formatted || '•••• •••• •••• ••••';
-        showCardPaymentError('');
-    });
-
-    cardHolderInput.addEventListener('input', (e) => {
-        if (e.target.readOnly) return;
-        const formatted = e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase();
-        e.target.value = formatted;
-        cardHolderDisplay.textContent = formatted || 'NGUYEN VAN A';
-    });
-
-    cardExpiryInput.addEventListener('input', (e) => {
-        if (e.target.readOnly) return;
-        const formatted = formatCardExpiry(e.target.value);
-        e.target.value = formatted;
-        cardExpiryDisplay.textContent = formatted || 'MM/YY';
-    });
-
-    cardCvvInput.addEventListener('input', (e) => {
-        const val = e.target.value.replace(/[^0-9]/g, '');
-        e.target.value = val;
-        cardCvvDisplay.textContent = val.replace(/./g, '•') || '•••';
-    });
-
-    // Rotating 3D card preview on CVV focus/blur
-    cardCvvInput.addEventListener('focus', () => {
-        creditCardPreview.classList.add('flipped');
-    });
-
-    cardCvvInput.addEventListener('blur', () => {
-        creditCardPreview.classList.remove('flipped');
-    });
-
-    // Card Form Checkout submission
-    creditCardForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        showCardPaymentError('');
-
-        const validation = validateCardPayment();
-        if (!validation.ok) {
-            showCardPaymentError(validation.message);
-            if (!window.FioreAuth?.getCurrentUser?.()) {
-                window.FioreAuth?.openAuthModal?.('login');
-            }
-            return;
-        }
-
-        if (validation.isFirstBind) {
-            const bindResult = window.FioreAuth.bindCardToUser(validation.user.id, {
-                digits: validation.digits,
-                holder: validation.holder,
-                expiry: validation.expiry
-            });
-            if (!bindResult.ok) {
-                showCardPaymentError(bindResult.message);
-                return;
-            }
-        }
-        
-        // Show payment spinner/loading screen for elegance
-        const originalBtnText = document.getElementById('cardPaymentSubmit').innerHTML;
-        document.getElementById('cardPaymentSubmit').innerHTML = `<div class="spinner-circle-small" style="border-top-color: #FAF7F2"></div> <span>Đang xác thực...</span>`;
-        document.getElementById('cardPaymentSubmit').disabled = true;
-
-        setTimeout(() => {
-            document.getElementById('cardPaymentSubmit').innerHTML = originalBtnText;
-            document.getElementById('cardPaymentSubmit').disabled = false;
-            
-            // Go to step 3
-            completeCheckout();
-        }, 2000);
-    });
-
-
-    // --- 12. BANK QR CODE COPY ACTIONS & SIMULATOR ---
+    // --- 11. BANK QR CODE COPY ACTIONS & SIMULATOR ---
     
     // Copy Action on Account number
     if (qrAccountNumber) {
@@ -1293,7 +1142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cart = [];
         updateCartUI();
 
-        // Send emails via EmailJS
         sendOrderEmails({
             orderId,
             sender,
@@ -1305,74 +1153,39 @@ document.addEventListener('DOMContentLoaded', () => {
             deliveryDate: formattedDate,
             deliveryTime: deliveryTimeVal,
             cardMessage: cardMsgVal,
-            cartItemsText: cartSnapshot.map(item =>
-                `${item.title} (${item.size.toUpperCase()}) x${item.quantity} = ${formatCurrency(item.singlePrice * item.quantity)}`
-            ).join(' | '),
-            orderTotal
+            cartItemsText: window.FioreOrderEmails
+                ? window.FioreOrderEmails.buildCartItemsText(cartSnapshot)
+                : cartSnapshot.map(item =>
+                    `${item.title} (${item.size.toUpperCase()}) x${item.quantity} = ${formatCurrency(item.singlePrice * item.quantity)}`
+                ).join(' | '),
+            orderTotal,
+            paymentMethod: selectedPaymentMethod
         });
     }
 
-    // --- 13a. EMAILJS SEND FUNCTION ---
     async function sendOrderEmails(data) {
-        // Show sending status
+        if (!emailSendingStatus || !emailStatusText) return;
+
         emailSendingStatus.style.display = 'flex';
-        emailSpinner.style.display = 'block';
+        if (emailSpinner) emailSpinner.style.display = 'block';
         emailStatusText.textContent = 'Đang gửi email xác nhận đơn hàng...';
         emailStatusText.style.color = '';
 
-        // Check if EmailJS is configured
-        if (EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') {
-            setTimeout(() => {
-                emailSpinner.style.display = 'none';
-                emailStatusText.innerHTML = `⚠️ EmailJS chưa được cấu hình. <a href="https://www.emailjs.com" target="_blank" style="color:var(--color-brand);text-decoration:underline">Xem hướng dẫn setup</a>`;
-                emailStatusText.style.color = '#b45309';
-            }, 800);
+        if (!window.FioreOrderEmails) {
+            if (emailSpinner) emailSpinner.style.display = 'none';
+            emailStatusText.innerHTML = '⚠️ Không tải được module gửi email.';
+            emailStatusText.style.color = '#b45309';
             return;
         }
 
-        // Initialize EmailJS
-        emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+        const result = await window.FioreOrderEmails.send(data);
 
-        const templateParams = {
-            order_id:         data.orderId,
-            sender_name:      data.sender,
-            sender_phone:     data.senderPhone,
-            sender_email:     data.senderEmail,
-            recipient_name:   data.recipient,
-            recipient_phone:  data.recipientPhone,
-            recipient_address:data.address,
-            delivery_date:    data.deliveryDate,
-            delivery_time:    data.deliveryTime,
-            card_message:     data.cardMessage,
-            cart_items:       data.cartItemsText,
-            order_total:      data.orderTotal,
-            store_email:      EMAILJS_CONFIG.storeEmail
-        };
-
-        try {
-            // Send email to customer
-            await emailjs.send(
-                EMAILJS_CONFIG.serviceId,
-                EMAILJS_CONFIG.customerTemplateId,
-                { ...templateParams, to_email: data.senderEmail, to_name: data.sender }
-            );
-
-            // Send notification email to store
-            await emailjs.send(
-                EMAILJS_CONFIG.serviceId,
-                EMAILJS_CONFIG.storeTemplateId,
-                { ...templateParams, to_email: EMAILJS_CONFIG.storeEmail, to_name: 'Fiòre' }
-            );
-
-            // Success!
-            emailSpinner.style.display = 'none';
-            emailStatusText.innerHTML = `✅ Email xác nhận đã gửi tới <strong>${data.senderEmail}</strong> thành công!`;
+        if (emailSpinner) emailSpinner.style.display = 'none';
+        if (result.ok) {
+            emailStatusText.innerHTML = `✅ ${result.message}`;
             emailStatusText.style.color = '#2d6a4f';
-
-        } catch (error) {
-            console.error('EmailJS error:', error);
-            emailSpinner.style.display = 'none';
-            emailStatusText.innerHTML = `❌ Không gửi được email. Vui lòng liên hệ hotline <strong>1900 6825</strong> để xác nhận đơn hàng.`;
+        } else {
+            emailStatusText.innerHTML = `❌ ${result.message}`;
             emailStatusText.style.color = '#c0392b';
         }
     }
@@ -1387,7 +1200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Reset inputs
         shippingForm.reset();
-        creditCardForm.reset();
         checkoutCardMessage.value = '';
 
         // Reset promo codes
@@ -1402,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const discountTotalRow = document.getElementById('discountTotalRow');
         if (discountTotalRow) discountTotalRow.style.display = 'none';
 
-        setupCardPaymentFields();
+        switchPaymentTab('qr');
     }
 
     // --- 13b. PROMO CODE APPLICATION ---
@@ -1676,7 +1488,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (q.includes('thanh toán') || q.includes('chuyển khoản') || q.includes('ngân hàng') || q.includes('ck') || q.includes('tai khoan') || q.includes('tài khoản')) {
                 return {
-                    text: "💳 Fióre hỗ trợ 2 phương thức thanh toán an toàn: \n1. Quét mã QR Dynamic qua VietQR Ngân hàng MBBank: \n- Số tài khoản: 091604468 \n- Chủ tài khoản: Ngô Thủy Vân \n- Ngân hàng: MBBank (MB) \n2. Thẻ tín dụng quốc tế Visa/MasterCard bảo mật cao.",
+                    text: "💳 Fióre hỗ trợ thanh toán an toàn: \n1. Quét mã VietQR qua MBBank (091604468 — Ngô Thủy Vân). \n2. Cổng VNPay Sandbox (thẻ ATM / ví điện tử trên môi trường thử).",
                     quickReplies: [
                         { text: "🎁 Khuyến mãi giảm giá", keyword: "khuyến mãi" },
                         { text: "📞 Liên hệ trực tiếp", keyword: "hotline" }

@@ -4,7 +4,13 @@
   "description": "Fiòre - Boutique de Fleurs Premium Flower Shop website",
   "main": "index.html",
   "scripts": {
-    "dev": "browser-sync start --server --files \"*.html, *.css, *.js, images/*\""
+    "dev": "node server/index.js",
+    "dev:static": "browser-sync start --server --files \"*.html, *.css, *.js, images/*\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
   },
   "devDependencies": {
     "browser-sync": "^3.0.3"

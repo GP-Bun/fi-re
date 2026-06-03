@@ -753,7 +753,13 @@
                 <div class="kv">
                     <div class="k">Lời chúc</div><div class="v">${safeText(order.cardMessage)}</div>
                     <div class="k">Mã giảm giá</div><div class="v" style="color:var(--color-brand-rose);">${order.discountCode ? order.discountCode + ' (-' + formatCurrency(order.discountAmount || 0) + ')' : 'Không sử dụng'}</div>
-                    <div class="k">Thanh toán</div><div class="v">${safeText(order.paymentMethod === 'card' ? 'Thẻ Visa/Master' : 'Chuyển khoản QR')}</div>
+                    <div class="k">Thanh toán</div><div class="v">${safeText(
+                        order.paymentMethod === 'card'
+                            ? 'Thẻ Visa/Master'
+                            : order.paymentMethod === 'vnpay'
+                                ? 'VNPay'
+                                : 'Chuyển khoản QR'
+                    )}</div>
                     <div class="k">Tổng đơn</div><div class="v" style="font-weight: 750; color: var(--color-brand-green);">${safeText(order.totalText)}</div>
                     <div class="k">Tạo lúc</div><div class="v">${safeText(formatDateTime(order.createdAt))}</div>
                 </div>
