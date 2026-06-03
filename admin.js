@@ -90,6 +90,9 @@
         barCancelledPct: document.getElementById('barCancelledPct'),
         dashTopProductsTbody: document.getElementById('dashTopProductsTbody'),
         dashRecentOrdersTbody: document.getElementById('dashRecentOrdersTbody'),
+        revenueBarChart: document.getElementById('revenueBarChart'),
+        revenueChartTotal: document.getElementById('revenueChartTotal'),
+        revenueChartNote: document.getElementById('revenueChartNote'),
 
         // Orders Tab
         orderSearch: document.getElementById('adminSearch'),
@@ -225,6 +228,136 @@
         return clean ? parseInt(clean, 10) : 0;
     }
 
+    function toLocalDateKey(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function getOrderDateKey(iso) {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return null;
+        return toLocalDateKey(d);
+    }
+
+    function formatShortCurrency(val) {
+        if (val >= 1_000_000) {
+            const tr = val / 1_000_000;
+            return `${tr % 1 === 0 ? tr : tr.toFixed(1).replace(/\.0$/, '')}tr`;
+        }
+        if (val >= 1_000) return `${Math.round(val / 1_000)}k`;
+        return formatCurrency(val);
+    }
+
+    function formatRevenueDayLabel(date, isToday) {
+        if (isToday) return 'Hôm nay';
+        const weekdays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        return `${weekdays[date.getDay()]} ${dd}/${mm}`;
+    }
+
+    function buildRevenueLast7Days(orders) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const days = [];
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            days.push({
+                key: toLocalDateKey(d),
+                date: d,
+                revenue: 0,
+                orderCount: 0
+            });
+        }
+
+        const dayMap = Object.fromEntries(days.map(day => [day.key, day]));
+
+        orders.forEach(o => {
+            if (o.status !== 'completed') return;
+            const key = getOrderDateKey(o.createdAt);
+            if (!key || !dayMap[key]) return;
+            dayMap[key].revenue += parseMoneyText(o.totalText);
+            dayMap[key].orderCount += 1;
+        });
+
+        return days;
+    }
+
+    function renderRevenueChart(orders) {
+        if (!el.revenueBarChart) return;
+
+        const days = buildRevenueLast7Days(orders);
+        const total7 = days.reduce((sum, d) => sum + d.revenue, 0);
+        const maxRevenue = Math.max(...days.map(d => d.revenue), 1);
+        const todayKey = toLocalDateKey(new Date());
+
+        if (el.revenueChartTotal) {
+            el.revenueChartTotal.textContent = `Tổng 7 ngày: ${formatCurrency(total7)}`;
+        }
+
+        if (el.revenueChartNote) {
+            if (total7 === 0) {
+                el.revenueChartNote.classList.add('is-empty-hint');
+                el.revenueChartNote.innerHTML = 'Chưa có đơn <strong>Hoàn tất</strong> trong 7 ngày qua. Cập nhật trạng thái đơn ở mục Quản lý Đơn hàng để xem biểu đồ.';
+            } else {
+                el.revenueChartNote.classList.remove('is-empty-hint');
+                el.revenueChartNote.innerHTML = 'Chỉ tính đơn có trạng thái <strong>Hoàn tất</strong>.';
+            }
+        }
+
+        el.revenueBarChart.innerHTML = '';
+
+        days.forEach(day => {
+            const isToday = day.key === todayKey;
+            const hasRevenue = day.revenue > 0;
+            const heightPct = hasRevenue
+                ? Math.max(Math.round((day.revenue / maxRevenue) * 100), 12)
+                : 4;
+
+            const col = document.createElement('div');
+            col.className = 'revenue-bar-col';
+
+            const valueEl = document.createElement('span');
+            valueEl.className = `revenue-bar-value${hasRevenue ? '' : ' is-empty'}`;
+            valueEl.textContent = hasRevenue ? formatShortCurrency(day.revenue) : '—';
+            valueEl.title = hasRevenue ? formatCurrency(day.revenue) : 'Không có doanh thu';
+
+            const track = document.createElement('div');
+            track.className = 'revenue-bar-track';
+
+            const fill = document.createElement('div');
+            fill.className = `revenue-bar-fill${isToday ? ' is-today' : ''}`;
+            fill.style.height = `${heightPct}%`;
+            fill.title = hasRevenue
+                ? `${formatCurrency(day.revenue)} — ${day.orderCount} đơn`
+                : 'Không có doanh thu';
+
+            track.appendChild(fill);
+
+            const label = document.createElement('span');
+            label.className = 'revenue-bar-label';
+            label.textContent = formatRevenueDayLabel(day.date, isToday);
+
+            col.appendChild(valueEl);
+            col.appendChild(track);
+            col.appendChild(label);
+
+            if (day.orderCount > 0) {
+                const ordersLbl = document.createElement('span');
+                ordersLbl.className = 'revenue-bar-orders';
+                ordersLbl.textContent = `${day.orderCount} đơn`;
+                col.appendChild(ordersLbl);
+            }
+
+            el.revenueBarChart.appendChild(col);
+        });
+    }
+
     function formatDateTime(iso) {
         if (!iso) return '';
         const d = new Date(iso);
@@ -344,6 +477,8 @@
         if (el.barCompletedPct) el.barCompletedPct.textContent = `${pctCompleted}%`;
         if (el.barCancelled) el.barCancelled.style.width = `${pctCancelled}%`;
         if (el.barCancelledPct) el.barCancelledPct.textContent = `${pctCancelled}%`;
+
+        renderRevenueChart(orders);
 
         // Recent Orders list (max 5)
         const recentOrders = [...orders]
@@ -637,6 +772,7 @@
         orders[idx].status = status;
         writeOrders(orders);
         renderOrdersList();
+        if (activeTab === 'dashboard') renderDashboard();
     }
 
     function nextStatus(current) {

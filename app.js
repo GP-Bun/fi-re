@@ -1498,6 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProducts('all');
     }
     // --- 15. PREMIUM CHATBOT LOGIC ---
+    const chatbotContainer = document.getElementById('fioreChatbotContainer');
     const chatbotFab = document.getElementById('chatbotFab');
     const chatbotWindow = document.getElementById('chatbotWindow');
     const chatbotCloseBtn = document.getElementById('chatbotCloseBtn');
@@ -1506,12 +1507,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatbotSendBtn = document.getElementById('chatbotSendBtn');
 
     if (chatbotFab && chatbotWindow && chatbotCloseBtn && chatbotMessages) {
-        // Toggle Chat Window
-        chatbotFab.addEventListener('click', () => {
+        function openChatbot() {
             chatbotWindow.classList.add('open');
-            chatbotFab.style.display = 'none'; // Ẩn FAB khi mở cửa sổ chat
-            
-            // Send welcome message if empty
+            chatbotFab.style.display = 'none';
+
             if (chatbotMessages.children.length === 0) {
                 sendBotMessage("Xin chào! 🌸 Fióre Boutique de Fleurs rất vui được hỗ trợ bạn. Bạn cần tư vấn chọn hoa, giao hàng hay thông tin gì ạ?", [
                     { text: "💐 Chọn hoa sinh nhật", keyword: "sinh nhật" },
@@ -1520,30 +1519,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     { text: "🎁 Khuyến mãi hiện có", keyword: "khuyến mãi" }
                 ]);
             }
-        });
+        }
 
-        chatbotCloseBtn.addEventListener('click', () => {
+        function closeChatbot() {
             chatbotWindow.classList.remove('open');
-            chatbotFab.style.display = 'flex'; // Hiện lại FAB khi đóng cửa sổ chat
+            chatbotFab.style.display = 'flex';
+        }
+
+        chatbotFab.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openChatbot();
         });
 
-        // Click outside to close chat
+        chatbotCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeChatbot();
+        });
+
+        // Đóng khi bấm ra ngoài vùng chatbot (không dùng click trên FAB — đã stopPropagation)
         document.addEventListener('click', (e) => {
-            if (!chatbotWindow.contains(e.target) && !chatbotFab.contains(e.target) && chatbotWindow.classList.contains('open')) {
-                chatbotWindow.classList.remove('open');
-                chatbotFab.style.display = 'flex';
-            }
+            if (!chatbotWindow.classList.contains('open')) return;
+            const root = chatbotContainer || chatbotWindow;
+            if (root.contains(e.target)) return;
+            closeChatbot();
         });
 
-        // Send Message on Enter
-        chatbotInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleUserSendMessage();
-            }
-        });
+        if (chatbotInput) {
+            chatbotInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleUserSendMessage();
+                }
+            });
+        }
 
         if (chatbotSendBtn) {
-            chatbotSendBtn.addEventListener('click', () => {
+            chatbotSendBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 handleUserSendMessage();
             });
         }
@@ -1587,10 +1600,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.type = 'button';
                     btn.className = 'chatbot-quick-btn';
                     btn.textContent = qr.text;
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         renderMessage(qr.text, 'user');
-                        qrDiv.remove(); // Xóa quick replies sau khi click
-                        
+                        qrDiv.remove();
+
                         setTimeout(() => {
                             const reply = getBotReply(qr.keyword);
                             sendBotMessage(reply.text, reply.quickReplies);
