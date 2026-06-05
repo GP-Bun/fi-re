@@ -1955,6 +1955,7 @@ textarea:focus {
 }
 
 .vnpay-sandbox-hint {
+    display: none;
     font-size: 0.82rem;
     color: var(--color-text-secondary);
     background: #faf9f6;
