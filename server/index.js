@@ -44,10 +44,13 @@ function vnpayConfigured() {
 /** Tạo URL thanh toán VNPay Sandbox */
 app.post('/api/vnpay/create-payment', (req, res) => {
     if (!vnpayConfigured()) {
+        const isVercel = Boolean(process.env.VERCEL);
+        const message = isVercel
+            ? 'Chưa cấu hình biến môi trường VNPay trên Vercel. Vui lòng vào Project Settings -> Environment Variables trên Vercel Dashboard và thêm VNPAY_TMN_CODE, VNPAY_HASH_SECRET.'
+            : 'Chưa cấu hình VNPay. Sao chép .env.example thành .env và điền VNPAY_TMN_CODE, VNPAY_HASH_SECRET từ https://sandbox.vnpayment.vn';
         return res.status(503).json({
             success: false,
-            message:
-                'Chưa cấu hình VNPay. Sao chép .env.example thành .env và điền VNPAY_TMN_CODE, VNPAY_HASH_SECRET từ https://sandbox.vnpayment.vn'
+            message
         });
     }
 
@@ -98,9 +101,13 @@ app.post('/api/vnpay/create-payment', (req, res) => {
 /** Xác minh chữ ký khi VNPay redirect về (Return URL) */
 app.get('/api/vnpay/verify', (req, res) => {
     if (!vnpayConfigured()) {
+        const isVercel = Boolean(process.env.VERCEL);
+        const message = isVercel
+            ? 'VNPay chưa được cấu hình trên Vercel.'
+            : 'VNPay chưa được cấu hình trên server.';
         return res.status(503).json({
             success: false,
-            message: 'VNPay chưa được cấu hình trên server.'
+            message
         });
     }
 
