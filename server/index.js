@@ -28,6 +28,15 @@ function getClientIp(req) {
     return req.socket?.remoteAddress?.replace('::ffff:', '') || '127.0.0.1';
 }
 
+function getBaseUrl(req) {
+    if (process.env.APP_URL) {
+        return process.env.APP_URL.replace(/\/$/, '');
+    }
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const host = req.headers.host || `localhost:${PORT}`;
+    return `${protocol}://${host}`;
+}
+
 function vnpayConfigured() {
     return Boolean(VNPAY_TMN_CODE && VNPAY_HASH_SECRET);
 }
@@ -68,7 +77,7 @@ app.post('/api/vnpay/create-payment', (req, res) => {
             amountVnd: amountNum,
             txnRef: ref,
             orderInfo: info,
-            returnUrl: `${APP_URL}/vnpay-return.html`,
+            returnUrl: `${getBaseUrl(req)}/vnpay-return.html`,
             ipAddr: getClientIp(req)
         });
 
@@ -130,21 +139,25 @@ app.get('/api/vnpay/ipn', (req, res) => {
     return res.status(200).json({ RspCode: '00', Message: 'Confirm Success' });
 });
 
-app.get('/api/vnpay/status', (_req, res) => {
+app.get('/api/vnpay/status', (req, res) => {
     res.json({
         configured: vnpayConfigured(),
         sandbox: true,
-        returnUrl: `${APP_URL}/vnpay-return.html`
+        returnUrl: `${getBaseUrl(req)}/vnpay-return.html`
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`\n🌸 Fióre server: ${APP_URL}`);
-    if (!vnpayConfigured()) {
-        console.warn(
-            '⚠️  VNPay: chưa có .env — xem .env.example và đăng ký Sandbox tại https://sandbox.vnpayment.vn\n'
-        );
-    } else {
-        console.log('✓  VNPay Sandbox đã cấu hình (TMN:', VNPAY_TMN_CODE, ')\n');
-    }
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🌸 Fióre server: ${APP_URL}`);
+        if (!vnpayConfigured()) {
+            console.warn(
+                '⚠️  VNPay: chưa có .env — xem .env.example và đăng ký Sandbox tại https://sandbox.vnpayment.vn\n'
+            );
+        } else {
+            console.log('✓  VNPay Sandbox đã cấu hình (TMN:', VNPAY_TMN_CODE, ')\n');
+        }
+    });
+}
+
+module.exports = app;
